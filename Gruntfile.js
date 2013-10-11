@@ -249,16 +249,24 @@ module.exports = function (grunt) {
         rjsConfig: '<%= yeoman.app %>/scripts/main.js'
       }
     },
+
     handlebars: {
       compile: {
         options: {
-          namespace: 'JST'
+          namespace: 'Handlebars.templates',
+
+          // Make 'app/scripts/templates/foo/bar.hbs' available at:
+          //   Handlebars.templates['foo/bar']
+          processName: function(filepath) {
+            return filepath.replace(/^app\/scripts\/templates\//, '').replace(/\.hbs$/, '');
+          }
         },
         files: {
-          '.tmp/scripts/templates.js': ['<%= yeoman.app %>/scripts/templates/*.hbs']
+          '.tmp/scripts/templates.js': ['<%= yeoman.app %>/scripts/templates/**/*.hbs']
         }
       }
     },
+
     rev: {
       dist: {
         files: {
@@ -273,10 +281,6 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('createDefaultTemplate', function () {
-    grunt.file.write('.tmp/scripts/templates.js', 'this.JST = this.JST || {};');
-  });
-
   grunt.registerTask('server', function (target) {
     if (target === 'dist') {
       return grunt.task.run(['build', 'open', 'connect:dist:keepalive']);
@@ -284,7 +288,6 @@ module.exports = function (grunt) {
       return grunt.task.run([
         'clean:server',
         'coffee',
-        'createDefaultTemplate',
         'handlebars',
         'compass:server',
         'connect:test:keepalive'
@@ -294,7 +297,6 @@ module.exports = function (grunt) {
     grunt.task.run([
       'clean:server',
       'coffee:dist',
-      'createDefaultTemplate',
       'handlebars',
       'compass:server',
       'connect:livereload',
@@ -306,7 +308,6 @@ module.exports = function (grunt) {
   grunt.registerTask('test', [
     'clean:server',
     'coffee',
-    'createDefaultTemplate',
     'handlebars',
     'compass',
     'connect:test',
@@ -316,7 +317,6 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'clean:dist',
     'coffee',
-    'createDefaultTemplate',
     'handlebars',
     'compass:dist',
     'useminPrepare',
