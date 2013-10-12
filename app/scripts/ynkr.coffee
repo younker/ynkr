@@ -5,8 +5,8 @@ window.ynkr =
   Routers: {}
   init: ->
     'use strict'
-    console.log 'Hello from Backbone!'
+    (new ynkr.Views.HomeView).render()
 
 $ ->
   'use strict'
-  ynkr.init();
+  ynkr.init()
