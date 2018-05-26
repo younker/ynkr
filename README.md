@@ -1,4 +1,3 @@
-ynkr
-====
+==== ynkr
 
-http://ynkr.org
+The Cobbler's children have no shoes.
