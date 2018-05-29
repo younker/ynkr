@@ -23,7 +23,8 @@ class App extends Component {
                 bsStyle="success"
                 bsSize="large"
                 href="http://react-bootstrap.github.io/components.html"
-                target="_blank">
+                target="_blank"
+              >
                 Bootstrap Docs
               </Button>
             </p>
