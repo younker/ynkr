@@ -6,6 +6,7 @@
     "bootstrap": "3",
     "husky": "^0.14.3",
     "lint-staged": "^7.1.2",
+    "lodash": "^4.17.10",
     "prettier": "^1.13.2",
     "react": "^16.4.0",
     "react-bootstrap": "^0.32.1",
