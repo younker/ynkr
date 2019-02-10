@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import CommandLine from './CommandLine';
-import _ from 'lodash/fp';
+import Container from 'react-bootstrap/Container';
+
+import CommandLine from '../CommandLine';
 
 const defaultItemState = {
   focus: true,
-  prompt: '$',
+  prompt: '[user@ynkr.org] $',
   output: null,
   readonly: false
 };
@@ -12,8 +13,9 @@ const defaultItemState = {
 class Terminal extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      collection: [_.clone(defaultItemState)]
+      collection: [{ ...defaultItemState }]
     };
   }
 
@@ -31,7 +33,7 @@ class Terminal extends Component {
       );
     }, this);
 
-    return <div className="Terminal">{output}</div>;
+    return <Container fluid="true">{output}</Container>;
   }
 
   onKeyUpHandler(e) {
@@ -40,19 +42,21 @@ class Terminal extends Component {
     //   persist cmd history
     switch (e.keyCode) {
       case 13: // enter
-        const previous = _.merge(this.state.collection.pop(), {
+        const previous = {
+          ...this.state.collection.pop(), 
           readonly: true,
           output: this.execCmd(e.target.value),
           focus: false
-        });
+        };
 
         this.setState({
           collection: [
             ...this.state.collection,
             previous,
-            _.clone(defaultItemState)
+            { ...defaultItemState }
           ]
         });
+
         e.preventDefault();
         break;
       default:

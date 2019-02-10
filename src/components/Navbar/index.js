@@ -1,10 +1,12 @@
 import React from 'react';
 import { Navbar } from 'react-bootstrap';
+import './style.css';
 
 const MyNavbar = props => (
-  <Navbar inverse staticTop>
-    <Navbar.Brand>
-      <a href="//ynkr.org">ynkr.org</a>
+  <Navbar bg="dark" variant="dark">
+    <Navbar.Brand href="//ynkr.org">
+      <span className="blend">Jason</span>
+      Y<span className="blend">ou</span>nk<span className="blend">e</span>r.org
     </Navbar.Brand>
   </Navbar>
 );
