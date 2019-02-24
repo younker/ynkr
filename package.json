@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "bootstrap": "^4.3.0",
+    "mocha": "^6.0.1",
     "react": "^16.8.1",
     "react-bootstrap": "^1.0.0-beta.5",
     "react-dom": "^16.8.1",
@@ -12,7 +13,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "mocha --require @babel/register ./test",
+    "test:watch": "mocha --require @babel/register --watch ./test",
     "eject": "react-scripts eject",
     "deploy": "npm run build && aws s3 sync ./build s3://ynkr"
   },
@@ -24,5 +26,10 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.3.3",
+    "@babel/register": "^7.0.0",
+    "chai": "^4.2.0"
+  }
 }
