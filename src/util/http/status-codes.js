@@ -87,5 +87,6 @@ const reduceFn = (acc, status) => {
 const codeToStatus = R.reduce(reduceFn, {}, R.keys(statusToCode));
 
 export const getStatusForCode = (code, defaultStatus = undefined) => {
-  return R.propOr(defaultStatus, code, codeToStatus);
+  const status = R.prop(code, codeToStatus);
+  return R.isNil(status) ? defaultStatus : parseInt(status);
 };
