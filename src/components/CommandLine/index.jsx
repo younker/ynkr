@@ -1,5 +1,5 @@
 import React from 'react';
-import './style.css';
+import './style.scss';
 
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -8,7 +8,7 @@ const CommandLine = (props) => (
   <div className='CommandLine'>
     <Row>
       <Col md='auto' className='prompt'>{props.prompt}</Col>
-      <Col className='in'>
+      <Col className='input'>
         <input
           type='text'
           autoFocus={props.focus}
@@ -19,7 +19,7 @@ const CommandLine = (props) => (
       </Col>
     </Row>
     <Row>
-      <Col className='out'>{props.output}</Col>
+      <Col className='output'>{props.output}</Col>
     </Row>
   </div>
 );

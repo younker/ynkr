@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Container from 'react-bootstrap/Container';
 
 import CommandLine from '../CommandLine';
+import './style.scss';
 
 const defaultItemState = {
   focus: true,
@@ -33,7 +34,7 @@ class Terminal extends Component {
       );
     }, this);
 
-    return <Container fluid="true">{output}</Container>;
+    return <Container className='Terminal' fluid='true'>{output}</Container>;
   }
 
   onKeyUpHandler(e) {

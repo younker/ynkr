@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navbar } from 'react-bootstrap';
-import './style.css';
+import './style.scss';
 
 const MyNavbar = props => (
   <Navbar bg="dark" variant="dark">

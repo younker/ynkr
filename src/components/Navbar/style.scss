@@ -1,0 +1,10 @@
+@import 'styles/_colors.scss';
+
+nav.navbar {
+  border-bottom: solid 2px $cmd-line-grey;
+  margin-bottom: 15px;
+
+  span.blend {
+    color: $cmd-line-grey;
+  }
+}
