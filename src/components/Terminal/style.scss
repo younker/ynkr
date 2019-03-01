@@ -1,1 +1,6 @@
-.Terminal { }
+@import 'styles/_colors.scss';
+
+.Terminal {
+  font-family: Inconsolata, monospace;
+  color: $cmd-line-grey;
+}

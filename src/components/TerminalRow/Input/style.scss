@@ -1,9 +1,4 @@
-@import 'styles/_colors.scss';
-
-.CommandLine {
-  font-family: Inconsolata, monospace;
-  color: $cmd-line-grey;
-
+.TerminalRow.Input {
   .prompt {
     padding-right: 5px;
   }
@@ -20,9 +15,5 @@
       border: none;
       color: inherit;
     }
-  }
-
-  .output {
-    color: $output-grey;
   }
 }

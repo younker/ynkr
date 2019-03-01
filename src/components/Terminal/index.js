@@ -1,40 +1,85 @@
+import * as R from 'ramda';
 import React, { Component } from 'react';
 import Container from 'react-bootstrap/Container';
 
-import CommandLine from '../CommandLine';
+import { Input, Output } from '../TerminalRow';
+
 import './style.scss';
 
-const defaultItemState = {
-  focus: true,
-  prompt: '[user@ynkr.org] $',
-  output: null,
-  readonly: false
-};
+// A prompt is effectively a new command line input component
+const PROMPT = { type: 'input', readonly: false };
 
 class Terminal extends Component {
   constructor(props) {
     super(props);
 
+    this.onKeyUpHandler = this.onKeyUpHandler.bind(this);
+
     this.state = {
-      collection: [{ ...defaultItemState }]
+      collection: [{ ...PROMPT }]
     };
   }
 
+  renderInput({ idx, readonly }) {
+    return (
+      <Input
+        key={`input-${idx}`}
+        keypressHandler={readonly ? null : this.onKeyUpHandler}
+        readonly={readonly}
+      />
+    );
+  }
+
+  renderOutput({ idx, command, args }) {
+    return (
+      <Output
+        key={`output-${idx}`}
+        command={command}
+        args={args}
+      />
+    );
+  }
+
   render() {
-    const output = this.state.collection.map((item, i) => {
-      return (
-        <CommandLine
-          key={i}
-          focus={item.focus}
-          keypressHandler={this.onKeyUpHandler.bind(this)}
-          prompt={item.prompt}
-          output={item.output}
-          readonly={item.readonly}
-        />
-      );
+    const termIO = this.state.collection.map(({ type, ...item }, idx) => {
+      const args = { idx, ...item };
+      return type === 'input' ? this.renderInput(args) : this.renderOutput(args);
     }, this);
 
-    return <Container className='Terminal' fluid='true'>{output}</Container>;
+    return (
+      <Container className='Terminal' fluid='true'>
+        { termIO }
+      </Container>
+    );
+  }
+
+  executeCommand(input) {
+    // Step 1: modify the previous input field so that it is no longer active
+    const previousInput = {
+      ...this.state.collection.pop(), 
+      readonly: true,
+    };
+
+    // Step 2: parse the input and prepare output
+    const [command, ...args] = R.map(R.trim, input.split(' '));
+    const newOutput = {
+      type: 'output',
+      command,
+      args,
+    }
+
+    // Step 3: add a prompt
+    const prompt = { ...PROMPT };
+
+    // Step 4: "execute" the command (by rendering the newOutput)
+    this.setState({
+      collection: [
+        ...this.state.collection,
+        previousInput,
+        newOutput,
+        prompt,
+      ],
+    });
   }
 
   onKeyUpHandler(e) {
@@ -43,38 +88,12 @@ class Terminal extends Component {
     //   persist cmd history
     switch (e.keyCode) {
       case 13: // enter
-        const previous = {
-          ...this.state.collection.pop(), 
-          readonly: true,
-          output: this.execCmd(e.target.value),
-          focus: false
-        };
-
-        this.setState({
-          collection: [
-            ...this.state.collection,
-            previous,
-            { ...defaultItemState }
-          ]
-        });
-
+        this.executeCommand(e.target.value);
         e.preventDefault();
         break;
       default:
         break;
     }
-  }
-
-  execCmd(cmd) {
-    let out;
-    switch (cmd) {
-      case 'man':
-        out = 'What manual page do you want?';
-        break;
-      default:
-        out = `ynkr: command not found: ${cmd}`;
-    }
-    return out;
   }
 }
 
