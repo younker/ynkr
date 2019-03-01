@@ -13,7 +13,7 @@ const commands = {
   man: Man,
 };
 
-const Output = ({ command, args }) => {
+const Output = React.memo(({ command, args }) => {
   const Command = R.propOr(CommandNotFound, command, commands);
 
   return (
@@ -23,6 +23,6 @@ const Output = ({ command, args }) => {
       </Col>
     </Row>
   );
-};
+});
 
 export default Output;
