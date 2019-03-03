@@ -20,5 +20,9 @@ Your Friend,
 Jason Younker
 
 # TODO
+- [ ] allow double-click (select) -> copy. Right now `App`'s `useEffect` steals focus
+- [ ] command line:
+  - [ ] auto-complete
+  - [ ] reverse search
 - [ ] hook up ci
 - [ ] [dotenv-extended](https://www.npmjs.com/package/dotenv-extended)
