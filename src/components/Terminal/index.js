@@ -1,100 +1,55 @@
-import * as R from 'ramda';
-import React, { Component } from 'react';
+import React, { useReducer } from 'react';
 import Container from 'react-bootstrap/Container';
 
 import { Input, Output } from '../TerminalRow';
-
+import { processCommand, scrollToPosition } from './helpers';
 import './style.scss';
 
-// A prompt is effectively a new command line input component
-const PROMPT = { type: 'input', readonly: false };
+export const TerminalDispatch = React.createContext(null);
 
-class Terminal extends Component {
-  constructor(props) {
-    super(props);
+const renderInput = ({ idx }) => (<Input key={`input-${idx}`} />);
 
-    this.onKeyUpHandler = this.onKeyUpHandler.bind(this);
+const renderOutput = ({ idx, command, args }) => {
+  return (
+    <Output
+      key={`output-${idx}`}
+      command={command}
+      args={args}
+    />
+  );
+};
 
-    this.state = {
-      collection: [{ ...PROMPT }]
-    };
+const reducer = (state, { action, ...details }) => {
+  switch (action) {
+    case 'newCommand':
+      return processCommand(state, details);
+
+    case 'scroll':
+      return scrollToPosition(state, details);
+
+    default:
+      return state;
   }
+};
 
-  renderInput({ idx, readonly }) {
-    return (
-      <Input
-        key={`input-${idx}`}
-        keypressHandler={readonly ? null : this.onKeyUpHandler}
-        readonly={readonly}
-      />
-    );
-  }
+const DEFAULT_STATE = {
+  cursor: undefined,
+  collection: [{ type: 'input' }],
+};
 
-  renderOutput({ idx, command, args }) {
-    return (
-      <Output
-        key={`output-${idx}`}
-        command={command}
-        args={args}
-      />
-    );
-  }
+export default (props) => {
+  const [state, dispatch] = useReducer(reducer, DEFAULT_STATE);
 
-  render() {
-    const termIO = this.state.collection.map(({ type, ...item }, idx) => {
-      const args = { idx, ...item };
-      return type === 'input' ? this.renderInput(args) : this.renderOutput(args);
-    }, this);
+  const termIO = state.collection.map(({ type, ...item }, idx) => {
+    const args = { idx, ...item };
+    return type === 'input' ? renderInput(args) : renderOutput(args);
+  });
 
-    return (
+  return (
+    <TerminalDispatch.Provider value={dispatch}>
       <Container className='Terminal' fluid='true'>
         { termIO }
       </Container>
-    );
-  }
-
-  executeCommand(input) {
-    // Step 1: modify the previous input field so that it is no longer active
-    const previousInput = {
-      ...this.state.collection.pop(), 
-      readonly: true,
-    };
-
-    // Step 2: parse the input and prepare output
-    const [command, ...args] = R.map(R.trim, input.split(' '));
-    const newOutput = {
-      type: 'output',
-      command,
-      args,
-    }
-
-    // Step 3: add a prompt
-    const prompt = { ...PROMPT };
-
-    // Step 4: "execute" the command (by rendering the newOutput)
-    this.setState({
-      collection: [
-        ...this.state.collection,
-        previousInput,
-        newOutput,
-        prompt,
-      ],
-    });
-  }
-
-  onKeyUpHandler(e) {
-    // TODO: Desired functionality includes
-    // keyCode == 93 && e.ctrlKey -- reverse search mode. This means we need to
-    //   persist cmd history
-    switch (e.keyCode) {
-      case 13: // enter
-        this.executeCommand(e.target.value);
-        e.preventDefault();
-        break;
-      default:
-        break;
-    }
-  }
+    </TerminalDispatch.Provider>
+  );
 }
-
-export default Terminal;
