@@ -81,7 +81,9 @@ const onClickHandler = (owner, i, state, dispatch) => {
       // Handle the bot's move
       getBotMove(playerState).then(({ data, error}) => {
         if (error) {
-          dispatch({ action: 'setState', state: { code: ERROR, error } });
+          const message = 'HTTP Request to AWS Gateway endpoint failed ' +
+            ` with: [${error.status}] ${error.code} - ${error.message}`;
+          dispatch({ action: 'setState', state: { code: ERROR, message } });
         } else {
           const botOutcome = checkBoardState(data.board);
           const botState = { ...state, board: data.board, ...botOutcome };
@@ -134,7 +136,7 @@ const TicTacToe = (props) => {
     terminalDispatch({ action: 'commandComplete' });
 
   } else if (state.code === ERROR) {
-    prompt = <Prompt message='boom!' />
+    prompt = <Prompt message={state.message} />
     terminalDispatch({ action: 'commandComplete' });
 
   } else {
