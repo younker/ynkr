@@ -19,8 +19,6 @@ const onKeyUpHandler = (state, setState, dispatch, inputRef) => {
   }
 
   return (e) => {
-    console.log('------ e.keyCode:', e.keyCode);
-
     switch (e.keyCode) {
       case 78: // n
         if ( e.ctrlKey ) {

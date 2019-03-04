@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
+import { TerminalDispatch } from '../Terminal';
 import { publicCommands } from '../Commands';
 
 const Compgen = (props) => {
@@ -7,6 +8,9 @@ const Compgen = (props) => {
     .keys(publicCommands)
     .filter((cmd) => (cmd !== 'compgen'))
     .map((cmd) => (<li>{cmd}</li>));
+
+  const terminalDispatch = useContext(TerminalDispatch);
+  terminalDispatch({ action: 'addTerminalRow', type: 'input' });
 
   return <ul>{commands}</ul>;
 }
