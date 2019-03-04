@@ -31,7 +31,12 @@
       margin: auto;
       font-size: 70px;
       text-align: center;
+
       @include tic-tac-toe-border();
+
+      &.strike {
+        background-color: #333;
+      }
     }
   }
 }
