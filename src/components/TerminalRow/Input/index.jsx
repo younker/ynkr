@@ -13,32 +13,38 @@ const DEFAULT_STATE = {
   value: ''
 };
 
-const onKeyUpHandler = (e, state, setState, dispatch, inputRef) => {
-  switch (e.keyCode) {
-    case 78: // n
-      if ( e.ctrlKey ) {
-        dispatch({ action: 'scroll', direction: 'down', input: inputRef });
-      }
-      break;
-
-    case 80: // p
-      if ( e.ctrlKey ) {
-        dispatch({ action: 'scroll', direction: 'up', input: inputRef });
-      }
-      break;
-
-    case 13: // enter
-      const [command, ...args] = R.map(R.trim, e.target.value.split(' '));
-      dispatch({ action: 'newCommand', command, args });
-      setState({ ...state, readonly: true });
-      break;
-
-    default:
-      // noop but eslint requires a default case
+const onKeyUpHandler = (state, setState, dispatch, inputRef) => {
+  if (state.readonly) {
+    return undefined;
   }
 
-  e.preventDefault();
-}
+  return (e) => {
+    switch (e.keyCode) {
+      case 78: // n
+        if ( e.ctrlKey ) {
+          dispatch({ action: 'scroll', direction: 'down', input: inputRef });
+        }
+        break;
+
+      case 80: // p
+        if ( e.ctrlKey ) {
+          dispatch({ action: 'scroll', direction: 'up', input: inputRef });
+        }
+        break;
+
+      case 13: // enter
+        const [command, ...args] = R.map(R.trim, e.target.value.split(' '));
+        dispatch({ action: 'newCommand', command, args });
+        setState({ ...state, readonly: true });
+        break;
+
+      default:
+        // noop but eslint requires a default case
+    }
+
+    e.preventDefault();
+  }
+};
 
 const Input = () => {
   const [state, setState] = useState(DEFAULT_STATE);
@@ -55,7 +61,7 @@ const Input = () => {
           ref={inputRef}
           type='text'
           autoFocus={!state.readonly}
-          onKeyUp={e => onKeyUpHandler(e, state, setState, dispatch, inputRef)}
+          onKeyUp={onKeyUpHandler(state, setState, dispatch, inputRef)}
           readOnly={state.readonly}
           value={state.text}
         />
