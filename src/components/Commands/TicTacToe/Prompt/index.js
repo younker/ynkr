@@ -66,7 +66,7 @@ const Prompt = ({ message, code, winner }) => {
       <Col className='input'>
         <input
           type='text'
-          autoFocus='true'
+          autoFocus={true}
           onKeyUp={onKeyUpHandler({ gameOver, boardDispatch })}
         />
       </Col>
