@@ -21,6 +21,14 @@ const renderOutput = ({ idx, command, args }) => {
 
 const reducer = (state, { action, ...details }) => {
   switch (action) {
+    case 'addTerminalRow':
+      const collection = [
+        ...state.collection,
+        { type: 'input' }
+      ];
+      const scroll = undefined;
+      return { ...state, scroll, collection };
+
     case 'newCommand':
       return processCommand(state, details);
 
