@@ -20,6 +20,20 @@ const onKeyUpHandler = (state, setState, dispatch, inputRef) => {
 
   return (e) => {
     switch (e.keyCode) {
+      case 13: // enter
+        const [command, ...args] = R.map(R.trim, e.target.value.split(' '));
+        dispatch({ action: 'newCommand', command, args });
+        setState({ ...state, readonly: true });
+        break;
+
+      case 38: // up arrow
+        dispatch({ action: 'scroll', direction: 'up', input: inputRef });
+        break;
+
+      case 40: // up arrow
+        dispatch({ action: 'scroll', direction: 'down', input: inputRef });
+        break;
+
       case 78: // n
         if ( e.ctrlKey ) {
           dispatch({ action: 'scroll', direction: 'down', input: inputRef });
@@ -30,12 +44,6 @@ const onKeyUpHandler = (state, setState, dispatch, inputRef) => {
         if ( e.ctrlKey ) {
           dispatch({ action: 'scroll', direction: 'up', input: inputRef });
         }
-        break;
-
-      case 13: // enter
-        const [command, ...args] = R.map(R.trim, e.target.value.split(' '));
-        dispatch({ action: 'newCommand', command, args });
-        setState({ ...state, readonly: true });
         break;
 
       default:
