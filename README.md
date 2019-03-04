@@ -1,6 +1,6 @@
 # YNKR
 
-~http://ynkr.org~ Actually, until I update DNS, we are living at `http://ynkr.s3-website.us-east-2.amazonaws.com/`
+~http://ynkr.org~ Actually, until I update DNS, we are living at [ynkr.s3](http://ynkr.s3-website.us-east-2.amazonaws.com/)
 
 ## Note To Self
 
