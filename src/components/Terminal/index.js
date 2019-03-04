@@ -2,7 +2,7 @@ import React, { useReducer } from 'react';
 import Container from 'react-bootstrap/Container';
 
 import { Input, Output } from '../TerminalRow';
-import { processCommand, scrollToPosition } from './helpers';
+import { addPrompt, processCommand, scrollToPosition } from './helpers';
 import './style.scss';
 
 export const TerminalDispatch = React.createContext(null);
@@ -21,13 +21,8 @@ const renderOutput = ({ idx, command, args }) => {
 
 const reducer = (state, { action, ...details }) => {
   switch (action) {
-    case 'addTerminalRow':
-      const collection = [
-        ...state.collection,
-        { type: 'input' }
-      ];
-      const scroll = undefined;
-      return { ...state, scroll, collection };
+    case 'commandComplete':
+      return addPrompt(state);
 
     case 'newCommand':
       return processCommand(state, details);

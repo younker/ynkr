@@ -131,11 +131,11 @@ const TicTacToe = (props) => {
 
   let prompt;
   if (state.code === QUIT_GAME) {
-    terminalDispatch({ action: 'addTerminalRow', type: 'input' });
+    terminalDispatch({ action: 'commandComplete' });
 
   } else if (state.code === ERROR) {
     prompt = <Prompt message='boom!' />
-    terminalDispatch({ action: 'addTerminalRow', type: 'input' });
+    terminalDispatch({ action: 'commandComplete' });
 
   } else {
     prompt = <Prompt code={state.code} winner={state.winner} />;

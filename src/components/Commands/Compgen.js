@@ -10,7 +10,7 @@ const Compgen = (props) => {
     .map((cmd) => (<li>{cmd}</li>));
 
   const terminalDispatch = useContext(TerminalDispatch);
-  terminalDispatch({ action: 'addTerminalRow', type: 'input' });
+  terminalDispatch({ action: 'commandComplete' });
 
   return <ul>{commands}</ul>;
 }

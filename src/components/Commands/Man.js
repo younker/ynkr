@@ -20,7 +20,7 @@ const Man = ({ command, args }) => {
   const payload = R.propOr(MISSING_MANFILE(args), manfile, manfiles);
 
   const terminalDispatch = useContext(TerminalDispatch);
-  terminalDispatch({ action: 'addTerminalRow', type: 'input' });
+  terminalDispatch({ action: 'commandComplete' });
 
   return <div>{payload}</div>;
 }
