@@ -1,0 +1,19 @@
+.Prompt {
+  .output {
+    padding-right: 5px;
+  }
+
+  .input {
+    padding-left: 0px;
+
+    input {
+      outline: none;
+      background-color: transparent;
+      margin: 0;
+      width: 100%;
+      font: inherit;
+      border: none;
+      color: inherit;
+    }
+  }
+}

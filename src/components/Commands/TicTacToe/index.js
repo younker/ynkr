@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useReducer } from 'react';
 
+import Prompt from './Prompt';
+import { TerminalDispatch } from '../../Terminal';
 import { getRequester } from '../../../util/http/requester';
 import './style.scss';
 
-const PLAYERS = {
+export const BoardDispatch = React.createContext(null);
+
+export const PLAYERS = {
   '0': '',
   '1': 'X',
   '2': 'O',
@@ -20,8 +24,13 @@ const WINNING_COMBOS = [
   [6, 7, 8], // bottom row, straight across
 ];
 
+const OK = 'ok';
+const GAME_OVER = 'gameOver';
+const ERROR = 'error';
+const QUIT_GAME = 'quitGame';
+
 const DEFAULT_STATE = {
-  gameOver: false,
+  code: OK,
   winner: undefined,
   combo: [],
   board: [0,0,0,0,0,0,0,0,0],
@@ -41,19 +50,21 @@ const getBotMove = async ({ board }) => {
   return await requester();
 };
 
-const checkGameState = (board) => {
+const checkBoardState = (board) => {
   for (let [a,b,c] of WINNING_COMBOS) {
     const owners = [board[a], board[b], board[c]].join('');
     if (owners === '111' || owners === '222') {
-      return { gameOver: true, winner: board[a], combo: [a,b,c] };
+      return { code: GAME_OVER, winner: board[a], combo: [a,b,c] };
     }
   }
 
-  return { gameOver: !board.some(i => i === 0) };
+  const openCells = board.some(i => i === 0);
+  const code = openCells ? OK : GAME_OVER;
+  return { code };
 }
 
-const onClickHandler = (owner, i, state, setState) => {
-  if (owner || state.gameOver) {
+const onClickHandler = (owner, i, state, dispatch) => {
+  if (owner || state.code === GAME_OVER) {
     return;
   }
 
@@ -61,27 +72,50 @@ const onClickHandler = (owner, i, state, setState) => {
     let board = [...state.board];
     board[i] = 1;
 
-    const outcome = checkGameState(board);
-    const newState = { ...state, board, ...outcome };
-    setState(newState);
+    // Handle the player's move
+    const playerOutcome = checkBoardState(board);
+    const playerState = { ...state, board, ...playerOutcome };
+    dispatch({ action: 'setState', state: playerState });
 
-    if (!newState.gameOver) {
-      getBotMove(newState).then(({ data, error}) => {
-        const outcome = checkGameState(data.board);
-        const newState = { ...state, board: data.board, ...outcome };
-        setState(newState);
-      });
+    if (playerState.code === OK) {
+      // Handle the bot's move
+      getBotMove(playerState).then(({ data, error}) => {
+        if (error) {
+          dispatch({ action: 'setState', state: { code: ERROR, error } });
+        } else {
+          const botOutcome = checkBoardState(data.board);
+          const botState = { ...state, board: data.board, ...botOutcome };
+          dispatch({ action: 'setState', state: botState });
+        }
+    });
     }
 
     e.preventDefault();
   };
 };
 
+const reducer = (state, { action, ...args }) => {
+  switch(action) {
+    case 'restartGame':
+      return DEFAULT_STATE;
+
+    case 'quitGame':
+      return { ...state, code: QUIT_GAME };
+
+    case 'setState':
+      return { ...state, ...args.state };
+
+    default:
+      return state;
+  }
+};
+
 const TicTacToe = (props) => {
-  const [state, setState] = useState(DEFAULT_STATE);
+  const [state, dispatch] = useReducer(reducer, DEFAULT_STATE);
+  const terminalDispatch = useContext(TerminalDispatch);
 
   const createCell = (owner, i) => {
-    let handler = onClickHandler(owner, i, state, setState);
+    let handler = onClickHandler(owner, i, state, dispatch);
 
     let classes = ['cell'];
     if (state.combo.includes(i)) {
@@ -95,12 +129,27 @@ const TicTacToe = (props) => {
     );
   };
 
+  let prompt;
+  if (state.code === QUIT_GAME) {
+    terminalDispatch({ action: 'addTerminalRow', type: 'input' });
+
+  } else if (state.code === ERROR) {
+    prompt = <Prompt message='boom!' />
+    terminalDispatch({ action: 'addTerminalRow', type: 'input' });
+
+  } else {
+    prompt = <Prompt code={state.code} winner={state.winner} />;
+  }
+
   return (
-    <div className="TicTacToe">
-      <div className="board">
-        { state.board.map(createCell) }
+    <BoardDispatch.Provider value={dispatch}>
+      <div className="TicTacToe">
+        <div className="board">
+          { state.board.map(createCell) }
+        </div>
+        {prompt}
       </div>
-    </div>
+    </BoardDispatch.Provider>
   );
 }
 
