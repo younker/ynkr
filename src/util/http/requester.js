@@ -180,7 +180,6 @@ export function getRequester(naiveSpec, builderArgs) {
     }
 
     return await performHttpRequest({
-      body: naiveSpec.body,
       endpoint,
       url,
       ...requestArgs,
