@@ -1,4 +1,4 @@
-import R from 'ramda';
+import * as R from 'ramda';
 
 // Error Nomenclature
 //   - status: a numeric id for an HTTP state

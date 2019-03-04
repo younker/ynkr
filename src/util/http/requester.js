@@ -1,4 +1,4 @@
-import R from 'ramda';
+import * as R from 'ramda';
 import axios from 'axios';
 import pathToRegex from 'path-to-regexp';
 import { stringify } from 'query-string';
