@@ -2,6 +2,7 @@ import CommandNotFound from './CommandNotFound';
 import Compgen from './Compgen';
 import Man from './Man';
 import TicTacToe from './TicTacToe';
+import Welcome from './Welcome';
 
 export const publicCommands = {
   compgen: Compgen,
@@ -14,4 +15,5 @@ export default {
   Compgen,
   Man,
   TicTacToe,
+  Welcome,
 };

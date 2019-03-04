@@ -11,8 +11,9 @@ const MISSING_MANFILE = (args) => {
   return 'What manual page do you want?';
 }
 
+const LINKEDIN_URL = 'https://www.linkedin.com/in/younker/';
 const manfiles = {
-  ynkr: 'Oh yeah, but I have a sensitive side as well.',
+  ynkr: `Sorry, not much here. For what little I have, see ${LINKEDIN_URL}`
 };
 
 const Man = ({ command, args }) => {

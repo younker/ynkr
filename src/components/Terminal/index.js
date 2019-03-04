@@ -37,7 +37,10 @@ const reducer = (state, { action, ...details }) => {
 
 const DEFAULT_STATE = {
   cursor: undefined,
-  collection: [{ type: 'input' }],
+  collection: [
+    { type: 'output', command: 'welcome', args: { context: 'startup' } },
+    { type: 'input' }
+  ],
 };
 
 export default (props) => {
