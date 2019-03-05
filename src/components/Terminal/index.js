@@ -1,23 +1,24 @@
 import React, { useReducer } from 'react';
 import Container from 'react-bootstrap/Container';
 
+import Welcome from '../Welcome';
 import { Input, Output } from '../TerminalRow';
 import { addPrompt, processCommand, scrollToPosition } from './helpers';
 import './style.scss';
 
 export const TerminalDispatch = React.createContext(null);
 
-const renderInput = ({ idx }) => (<Input key={`input-${idx}`} />);
+const renderInput = ({ idx }) => (
+  <Input key={`input-${idx}`} />
+);
 
-const renderOutput = ({ idx, command, args }) => {
-  return (
-    <Output
-      key={`output-${idx}`}
-      command={command}
-      args={args}
-    />
-  );
-};
+const renderOutput = ({ idx, command, args }) => (
+  <Output
+    key={`output-${idx}`}
+    command={command}
+    args={args}
+  />
+);
 
 const reducer = (state, { action, ...details }) => {
   switch (action) {
@@ -36,11 +37,7 @@ const reducer = (state, { action, ...details }) => {
 };
 
 const DEFAULT_STATE = {
-  cursor: undefined,
-  collection: [
-    { type: 'output', command: 'welcome', args: { context: 'startup' } },
-    { type: 'input' }
-  ],
+  collection: [{ type: 'input' }],
 };
 
 export default (props) => {
@@ -54,6 +51,7 @@ export default (props) => {
   return (
     <TerminalDispatch.Provider value={dispatch}>
       <Container className='Terminal' fluid='true'>
+        <Welcome />
         { termIO }
       </Container>
     </TerminalDispatch.Provider>

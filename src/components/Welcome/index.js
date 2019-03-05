@@ -5,8 +5,7 @@ import './style.scss';
 const Welcome = (props) => {
   return (
     <div className="Welcome">
-      <pre>{`
-Welcome to Ynkr 0.0.1
+      <pre>{`Welcome to Ynkr 0.0.1
 
 * For available commands, run 'compgen'
 * For my resume, run 'man ynkr'
