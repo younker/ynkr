@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import Navbar from '../Navbar';
 import Terminal from '../Terminal';
-import './style.scss';
 
 const focusLastInputFn = () => {
   try {
