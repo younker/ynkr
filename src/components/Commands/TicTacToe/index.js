@@ -1,9 +1,8 @@
 import React, { useContext, useReducer } from 'react';
 
 import Prompt from './Prompt';
-import getRequester from '../../../util/http/requester';
-import retryable from '../../../util/http/retryable';
 import { TerminalDispatch } from '../../Terminal';
+import { checkBoardState, getBotMove } from './helpers';
 import './style.scss';
 
 export const BoardDispatch = React.createContext(null);
@@ -14,19 +13,10 @@ export const PLAYERS = {
   '2': 'O',
 };
 
-const WINNING_COMBOS = [
-  [0, 1, 2], // top row, straight across
-  [0, 3, 6], // left col, straight down
-  [0, 4, 8], // upper-left, lower-right diagonal
-  [1, 4, 7], // middle col, straight down
-  [2, 5, 8], // right col, straight down
-  [2, 4, 6], // upper-right, lower-left diagonal
-  [3, 4, 5], // middle row, straight across
-  [6, 7, 8], // bottom row, straight across
-];
-
-const OK = 'ok';
-const GAME_OVER = 'gameOver';
+// ERROR and QUIT_GAME are only knowable in this module as where OK and
+// GAME_OVER are required in order to relay the state of the board
+export const OK = 'ok';
+export const GAME_OVER = 'gameOver';
 const ERROR = 'error';
 const QUIT_GAME = 'quitGame';
 
@@ -36,33 +26,6 @@ const DEFAULT_STATE = {
   combo: [],
   board: [0,0,0,0,0,0,0,0,0],
 };
-
-const REQUEST_SPEC = {
-  specId: 'getBotT3Move',
-  method: 'post',
-  host: 'https://vpppfv00l4.execute-api.us-east-1.amazonaws.com',
-  path: '/prod/get-move',
-  body: undefined,
-};
-
-const getBotMove = async ({ board }) => {
-  const body = `{"board": [${board.toString()}]}`;
-  const { requester } = getRequester(REQUEST_SPEC, { body });
-  return await retryable(requester, { times: 2 });
-};
-
-const checkBoardState = (board) => {
-  for (let [a,b,c] of WINNING_COMBOS) {
-    const owners = [board[a], board[b], board[c]].join('');
-    if (owners === '111' || owners === '222') {
-      return { code: GAME_OVER, winner: board[a], combo: [a,b,c] };
-    }
-  }
-
-  const openCells = board.some(i => i === 0);
-  const code = openCells ? OK : GAME_OVER;
-  return { code };
-}
 
 const onClickHandler = (owner, i, state, dispatch) => {
   if (owner || state.code === GAME_OVER) {
