@@ -1,21 +1,25 @@
 import { trim } from 'ramda';
 
+const extractCommandHistoryFromState = ({ collection }) => {
+  return collection
+    .map(({ command, args }) => trim([command, args].join(' ')))
+    .reduce((acc, el) => {
+      if (el) { acc.push(el); }
+      return acc;
+    }, []);
+};
+
 export default (state, { direction, input }) => {
   let scroll = state.scroll;
-  if (!scroll) {
-    let commands = state.collection
-      .map((el) => {
-        return el.command ? trim([el.command, el.args].join(' ')) : null;
-      })
-      .reduce((acc, el) => {
-        if (el) { acc.push(el); }
-        return acc;
-      }, []);
 
-    // Set the current position of the cursor to the current command line
+  if (!scroll) {
+    let commands = extractCommandHistoryFromState(state);
+
+    // Set the current position of the cursor to the current command line and
+    // push the current input into the command history so that when they scroll
+    // back, they do not lose their current command
     const cursor = commands.length;
     commands.push(input.current.value);
-
     scroll = { cursor, commands };
   } else {
     // Save the current, potentially modified, command so that it persists
