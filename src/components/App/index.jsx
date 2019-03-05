@@ -3,12 +3,11 @@ import Navbar from '../Navbar';
 import Terminal from '../Terminal';
 
 const focusLastInputFn = () => {
-  try {
-    return document
-      .querySelectorAll('input[type=text]:not([readonly])')[0]
-      .focus();
-  } catch (e) {
-    console.log('Unable to locate active prompt: ', e);
+  const els = document.querySelectorAll('input[type=text]:not([readonly])');
+  if (els.length > 0) {
+    // if we somehow have more than 1 readonly input (we have a bug), pick the
+    // last one
+    els[els.length - 1].focus();
   }
 };
 
