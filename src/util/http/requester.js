@@ -148,7 +148,7 @@ function initializeSpec(naiveSpec, builderArgs = {}) {
   return { errors, spec };
 }
 
-export function getRequester(naiveSpec, builderArgs) {
+export default (naiveSpec, builderArgs) => {
   let { errors, spec } = initializeSpec(naiveSpec, builderArgs);
 
   let { error: pathError, path } = buildPath(spec.path, builderArgs);

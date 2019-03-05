@@ -1,8 +1,9 @@
 import React, { useContext, useReducer } from 'react';
 
 import Prompt from './Prompt';
+import getRequester from '../../../util/http/requester';
+import retryable from '../../../util/http/retryable';
 import { TerminalDispatch } from '../../Terminal';
-import { getRequester } from '../../../util/http/requester';
 import './style.scss';
 
 export const BoardDispatch = React.createContext(null);
@@ -47,7 +48,7 @@ const REQUEST_SPEC = {
 const getBotMove = async ({ board }) => {
   const body = `{"board": [${board.toString()}]}`;
   const { requester } = getRequester(REQUEST_SPEC, { body });
-  return await requester();
+  return await retryable(requester, { times: 2 });
 };
 
 const checkBoardState = (board) => {

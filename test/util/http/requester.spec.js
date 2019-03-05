@@ -4,8 +4,8 @@ import proxyquire from 'proxyquire';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
+import getRequester from '../../../src/util/http/requester';
 import { createAsync, expectToFindErrorCode } from '../../../test/helper';
-import { getRequester } from '../../../src/util/http/requester.js';
 
 chai.use(sinonChai);
 const { expect } = chai;
@@ -101,12 +101,12 @@ describe('/util/http/requester', function() {
   describe('#getRequester HTTP requests', function() {
     const getTarget = (spies) => proxyquire('../../../src/util/http/requester', {
       axios: R.propOr({}, 'axios', spies),
-    });
+    }).default;
 
     it('makes HTTP request with expected args', async function() {
       const spies = { axios: { get: sinon.spy() } };
 
-      const { requester } = getTarget(spies).getRequester(validSpec, validArgs);
+      const { requester } = getTarget(spies)(validSpec, validArgs);
       await requester();
 
       expect(spies.axios.get).to.be.calledWith(sinon.match((args) => {
@@ -119,7 +119,7 @@ describe('/util/http/requester', function() {
       const spies = { axios: { get: sinon.spy() } };
       const queryParams = {};
 
-      const { requester } = getTarget(spies).getRequester(validSpec, { ...validArgs, queryParams });
+      const { requester } = getTarget(spies)(validSpec, { ...validArgs, queryParams });
       await requester();
 
       expect(spies.axios.get).to.be.calledWith(sinon.match((args) => {
@@ -131,7 +131,7 @@ describe('/util/http/requester', function() {
       const spies = { axios: { get: sinon.spy() } };
       const queryParams = { query: 'params' };
 
-      const { requester } = getTarget(spies).getRequester(validSpec, { ...validArgs, queryParams });
+      const { requester } = getTarget(spies)(validSpec, { ...validArgs, queryParams });
       await requester();
 
       expect(spies.axios.get).to.be.calledWith(sinon.match((args) => {
@@ -145,7 +145,7 @@ describe('/util/http/requester', function() {
       const spy = sinon.spy(createAsync({ resolveWith: response }));
       const spies = { axios: { get: spy } };
 
-      const { requester } = getTarget(spies).getRequester(validSpec, validArgs);
+      const { requester } = getTarget(spies)(validSpec, validArgs);
       const { data, error } = await requester();
 
       expect(data).to.equal(payload);
@@ -160,7 +160,7 @@ describe('/util/http/requester', function() {
         }
       };
 
-      const { requester } = getTarget(spies).getRequester(validSpec, validArgs);
+      const { requester } = getTarget(spies)(validSpec, validArgs);
       const { error: { message, code } } = await requester();
       expect(message).to.equal(httpFailure);
       expect(code).to.equal('INTERNAL_SERVER_ERROR');
