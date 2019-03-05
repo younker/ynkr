@@ -38,10 +38,10 @@ const onKeyUpHandler = ({ boardDispatch, gameOver }) => {
   };
 };
 
-const Prompt = ({ message, code, winner }) => {
+const Prompt = ({ message, gameCode, winner }) => {
   const boardDispatch = useContext(BoardDispatch);
 
-  const gameOver = code === 'gameOver';
+  const gameOver = gameCode === 'gameOver';
 
   let output;
   if (message) {

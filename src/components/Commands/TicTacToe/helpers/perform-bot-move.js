@@ -15,8 +15,24 @@ const REQUEST_SPEC = {
   body: undefined,
 };
 
-export default async ({ board }) => {
+const makeRequest = async (board) => {
   const body = `{"board": [${board.toString()}]}`;
   const { requester } = getRequester(REQUEST_SPEC, { body });
   return await retryable(requester, { times: MAX_RETRIES });
 };
+
+const handleResponse = (dispatch) => {
+  return ({ data, error }) => {
+    if (error) {
+      const message = 'HTTP Request to AWS Gateway endpoint failed ' +
+        ` with: [${error.status}] ${error.code} - ${error.message}`;
+      dispatch({ action: 'error', message });
+
+    } else {
+      const board = data.board;
+      dispatch({ action: 'botMove', board });
+    }
+  };
+};
+
+export default (board, dispatch) => makeRequest(board).then(handleResponse(dispatch));

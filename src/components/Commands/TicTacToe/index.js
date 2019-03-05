@@ -1,8 +1,9 @@
 import React, { useContext, useReducer } from 'react';
 
+import Cell from './Cell';
 import Prompt from './Prompt';
 import { TerminalDispatch } from '../../Terminal';
-import { checkBoardState, getBotMove } from './helpers';
+import { checkBoardState, performBotMove } from './helpers';
 import './style.scss';
 
 export const BoardDispatch = React.createContext(null);
@@ -22,54 +23,33 @@ const QUIT_GAME = 'quitGame';
 
 const DEFAULT_STATE = {
   code: OK,
+  turn: '1',
   winner: undefined,
   combo: [],
   board: [0,0,0,0,0,0,0,0,0],
 };
 
-const onClickHandler = (owner, i, state, dispatch) => {
-  if (owner || state.code === GAME_OVER) {
-    return;
-  }
-
-  return (e) => {
-    let board = [...state.board];
-    board[i] = 1;
-
-    // Handle the player's move
-    const playerOutcome = checkBoardState(board);
-    const playerState = { ...state, board, ...playerOutcome };
-    dispatch({ action: 'setState', state: playerState });
-
-    if (playerState.code === OK) {
-      // Handle the bot's move
-      getBotMove(playerState).then(({ data, error}) => {
-        if (error) {
-          const message = 'HTTP Request to AWS Gateway endpoint failed ' +
-            ` with: [${error.status}] ${error.code} - ${error.message}`;
-          dispatch({ action: 'setState', state: { code: ERROR, message } });
-        } else {
-          const botOutcome = checkBoardState(data.board);
-          const botState = { ...state, board: data.board, ...botOutcome };
-          dispatch({ action: 'setState', state: botState });
-        }
-    });
-    }
-
-    e.preventDefault();
-  };
-};
-
 const reducer = (state, { action, ...args }) => {
   switch(action) {
+    case 'playerMove':
+      let board = [ ...state.board ];
+      board[args.position] = 1;
+      let outcome = checkBoardState(board);
+      return { ...state, ...outcome, board, turn: '2' };
+
+    case 'botMove':
+      board = args.board;
+      outcome = checkBoardState(board);
+      return { ...state, ...outcome, board, turn: '1' };
+
+    case 'error':
+      return { ...state, code: ERROR, message: args.message };
+
     case 'restartGame':
       return DEFAULT_STATE;
 
     case 'quitGame':
       return { ...state, code: QUIT_GAME };
-
-    case 'setState':
-      return { ...state, ...args.state };
 
     default:
       return state;
@@ -80,20 +60,16 @@ const TicTacToe = (props) => {
   const [state, dispatch] = useReducer(reducer, DEFAULT_STATE);
   const terminalDispatch = useContext(TerminalDispatch);
 
-  const createCell = (owner, i) => {
-    let handler = onClickHandler(owner, i, state, dispatch);
-
-    let classes = ['cell'];
-    if (state.combo.includes(i)) {
-      classes.push('strike');
-    }
-
-    return (
-      <div key={i} className={classes.join(' ')} onClick={handler}>
-        { PLAYERS[owner.toString()] }
-      </div>
-    );
-  };
+  const createCell = (owner, i) => (
+    <Cell
+      key={i}
+      position={i}
+      owner={owner}
+      gameCode={state.code}
+      turn={state.turn}
+      strike={state.combo.includes(i)}
+    />
+  );
 
   let prompt;
   if (state.code === QUIT_GAME) {
@@ -104,7 +80,11 @@ const TicTacToe = (props) => {
     terminalDispatch({ action: 'commandComplete' });
 
   } else {
-    prompt = <Prompt code={state.code} winner={state.winner} />;
+    if (state.code === OK && state.turn === '2') {
+      performBotMove(state.board, dispatch);
+    }
+
+    prompt = <Prompt gameCode={state.code} winner={state.winner} />;
   }
 
   return (

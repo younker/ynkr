@@ -1,21 +1,3 @@
-@import 'styles/_colors.scss';
-
-@mixin tic-tac-toe-border {
-  border: none $output-grey 3px;
-
-  // top row / first 3 elements: -0+3=3, -1+3=2, -2+3=1
-  &:nth-child(-n+3) { border-bottom-style: solid; }
-
-  // bottom row / last 3 elements: 0+7=7, 1+7=8, 2+7=9
-  &:nth-child(n+7) { border-top-style: solid; }
-
-  // left col: (3*0)+1=1, (3*1)+1=4, (3*2)+1=7
-  &:nth-child(3n+1) { border-right-style: solid; clear: both; }
-
-  // right col: (3*0)+3=3, (3*1)+3=6, (3*2)+3=9
-  &:nth-child(3n+3) { border-left-style: solid; }
-}
-
 .TicTacToe {
   padding: 10px;
 
@@ -24,19 +6,5 @@
     flex-wrap: wrap;
     width: 300px;
     height: 300px;
-
-    .cell {
-      width: 33.33333%;
-      height: 33.33333%;
-      margin: auto;
-      font-size: 70px;
-      text-align: center;
-
-      @include tic-tac-toe-border();
-
-      &.strike {
-        background-color: #333;
-      }
-    }
   }
 }
