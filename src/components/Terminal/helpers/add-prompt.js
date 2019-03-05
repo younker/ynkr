@@ -4,8 +4,9 @@ export default (state) => {
     { type: 'input' }
   ];
 
-  // See Terminal/helpers/process-command.js for the answer to why we do this
-  // here.
+  // The scrolling mechanism can mutate command history and since we do not want
+  // those mutations persisting between executed commands, we always reset the
+  // scroll state when adding a new prompt.
   const scroll = undefined;
 
   return { ...state, scroll, collection };
