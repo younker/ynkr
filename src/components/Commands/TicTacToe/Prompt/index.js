@@ -2,31 +2,32 @@ import React, { useContext } from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-import { PLAYERS, BoardDispatch } from '../index';
+import { CELL_OWNERS } from '../constants';
+import { GameDispatch } from '../index';
 import './style.scss';
 
-const onKeyUpHandler = ({ boardDispatch, gameOver }) => {
+const onKeyUpHandler = ({ gameDispatch, gameOver }) => {
   return (e) => {
     switch (e.keyCode) {
       case 82: // r[estart]
         e.currentTarget.value = ''
-        boardDispatch({ action: 'restartGame' });
+        gameDispatch({ action: 'restartGame' });
         break;
 
       case 81: // q[uit]
-        boardDispatch({ action: 'quitGame' });
+        gameDispatch({ action: 'quitGame' });
         break;
 
       case 89: // y[es] (play again?)
         if (gameOver) {
           e.currentTarget.value = ''
-          boardDispatch({ action: 'restartGame' });
+          gameDispatch({ action: 'restartGame' });
         }
         break;
 
       case 78: // n[o] (play again?)
         if (gameOver) {
-          boardDispatch({ action: 'quitGame' });
+          gameDispatch({ action: 'quitGame' });
         }
         break;
 
@@ -39,7 +40,7 @@ const onKeyUpHandler = ({ boardDispatch, gameOver }) => {
 };
 
 const Prompt = ({ message, gameCode, winner }) => {
-  const boardDispatch = useContext(BoardDispatch);
+  const gameDispatch = useContext(GameDispatch);
 
   const gameOver = gameCode === 'gameOver';
 
@@ -51,7 +52,7 @@ const Prompt = ({ message, gameCode, winner }) => {
     if (!winner) {
       output = 'Draw! Play again? [y,n]';
     } else {
-      output = `${PLAYERS[winner]} Wins! Play again? [y,n]`;
+      output = `${CELL_OWNERS[winner]} Wins! Play again? [y,n]`;
     }
 
   } else {
@@ -67,7 +68,7 @@ const Prompt = ({ message, gameCode, winner }) => {
         <input
           type='text'
           autoFocus={true}
-          onKeyUp={onKeyUpHandler({ gameOver, boardDispatch })}
+          onKeyUp={onKeyUpHandler({ gameOver, gameDispatch })}
         />
       </Col>
     </Row>

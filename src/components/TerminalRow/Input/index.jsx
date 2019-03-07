@@ -10,7 +10,7 @@ import './style.scss';
 const DEFAULT_STATE = {
   prompt: '[user@ynkr.org] $',
   readonly: false,
-  value: ''
+  text: 'tic-tac-toe'
 };
 
 const onKeyUpHandler = (state, setState, dispatch, inputRef) => {

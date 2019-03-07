@@ -1,42 +1,32 @@
 import React, { useContext } from 'react';
 
-import { BoardDispatch, OK, PLAYERS } from '../index';
+import { CELL_OWNERS, PLAYER_ONE, MOVE_COMPLETE } from '../constants';
+import { GameDispatch } from '../index';
 import './style.scss';
 
-const HUMAN_PLAYER = '1';
-
-const onClickHandler = ({ active, position, boardDispatch }) => {
-  if (!active) {
+const onClickHandler = ({ owner, turn, position, gameDispatch }) => {
+  // for now, player one is the only one that can make a move
+  if (owner || turn !== PLAYER_ONE) {
     return;
   }
 
   return (e) => {
-    boardDispatch({ action: 'playerMove', position });
+    gameDispatch({ action: MOVE_COMPLETE, player: turn, position });
     e.preventDefault();
   }
-}
+};
 
-const Cell = ({ gameCode, owner, position, turn, strike }) => {
-  const boardDispatch = useContext(BoardDispatch);
 
-  let classes = ['Cell'];
-  if (strike) {
-    classes.push('strike');
-  }
-
-  // This translates to:
-  // - The cell currently has no owner
-  // - The game is still ongoing
-  // - It is the (human) player's turn
-  const active = !owner && gameCode === OK && turn === HUMAN_PLAYER;
+const Cell = ({ owner, turn, position, strike }) => {
+  const gameDispatch = useContext(GameDispatch);
 
   return (
     <div
-      className={classes.join(' ')}
+      className={'Cell ' + (strike ? 'strike' : '')}
       position={position}
-      onClick={onClickHandler({ active, position, boardDispatch })}
+      onClick={onClickHandler({ owner, turn, position, gameDispatch })}
     >
-      { PLAYERS[owner.toString()] }
+      { CELL_OWNERS[owner] }
     </div>
   );
 };

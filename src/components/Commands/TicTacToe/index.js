@@ -1,55 +1,44 @@
 import React, { useContext, useReducer } from 'react';
 
-import Cell from './Cell';
+import Board from './Board';
 import Prompt from './Prompt';
+import { GAME_ON, GAME_ERROR, QUIT_GAME, PLAYER_ONE, PLAYER_TWO } from './constants';
 import { TerminalDispatch } from '../../Terminal';
 import { checkBoardState, performBotMove } from './helpers';
 import './style.scss';
 
-export const BoardDispatch = React.createContext(null);
-
-export const PLAYERS = {
-  '0': '',
-  '1': 'X',
-  '2': 'O',
-};
-
-// ERROR and QUIT_GAME are only knowable in this module as where OK and
-// GAME_OVER are required in order to relay the state of the board
-export const OK = 'ok';
-export const GAME_OVER = 'gameOver';
-const ERROR = 'error';
-const QUIT_GAME = 'quitGame';
+export const GameDispatch = React.createContext(null);
 
 const DEFAULT_STATE = {
-  code: OK,
-  turn: '1',
+  status: GAME_ON,
+  turn: PLAYER_ONE,
   winner: undefined,
   combo: [],
   board: [0,0,0,0,0,0,0,0,0],
 };
 
 const reducer = (state, { action, ...args }) => {
+  console.log('------ TTT state, action, args:', state, action, args);
   switch(action) {
     case 'playerMove':
       let board = [ ...state.board ];
       board[args.position] = 1;
       let outcome = checkBoardState(board);
-      return { ...state, ...outcome, board, turn: '2' };
+      return { ...state, ...outcome, board, turn: PLAYER_TWO };
 
     case 'botMove':
       board = args.board;
       outcome = checkBoardState(board);
-      return { ...state, ...outcome, board, turn: '1' };
+      return { ...state, ...outcome, board, turn: PLAYER_ONE };
 
     case 'error':
-      return { ...state, code: ERROR, message: args.message };
+      return { ...state, status: GAME_ERROR, message: args.message };
 
     case 'restartGame':
       return DEFAULT_STATE;
 
     case 'quitGame':
-      return { ...state, code: QUIT_GAME };
+      return { ...state, status: QUIT_GAME };
 
     default:
       return state;
@@ -60,42 +49,33 @@ const TicTacToe = (props) => {
   const [state, dispatch] = useReducer(reducer, DEFAULT_STATE);
   const terminalDispatch = useContext(TerminalDispatch);
 
-  const createCell = (owner, i) => (
-    <Cell
-      key={i}
-      position={i}
-      owner={owner}
-      gameCode={state.code}
-      turn={state.turn}
-      strike={state.combo.includes(i)}
-    />
-  );
-
   let prompt;
-  if (state.code === QUIT_GAME) {
+  if (state.status === QUIT_GAME) {
     terminalDispatch({ action: 'commandComplete' });
 
-  } else if (state.code === ERROR) {
+  } else if (state.status === GAME_ERROR) {
     prompt = <Prompt message={state.message} />
     terminalDispatch({ action: 'commandComplete' });
 
   } else {
-    if (state.code === OK && state.turn === '2') {
+    if (state.status === GAME_ON && state.turn === PLAYER_TWO) {
       performBotMove(state.board, dispatch);
     }
 
-    prompt = <Prompt gameCode={state.code} winner={state.winner} />;
+    prompt = <Prompt gameCode={state.status} winner={state.winner} />;
   }
 
   return (
-    <BoardDispatch.Provider value={dispatch}>
+    <GameDispatch.Provider value={dispatch}>
       <div className="TicTacToe">
-        <div className="board">
-          { state.board.map(createCell) }
-        </div>
+        <Board
+          cells={state.board}
+          turn={state.turn}
+          winningCombo={state.combo}
+        />
         {prompt}
       </div>
-    </BoardDispatch.Provider>
+    </GameDispatch.Provider>
   );
 }
 

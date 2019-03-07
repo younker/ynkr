@@ -1,4 +1,4 @@
-import { GAME_OVER, OK } from '../index';
+import { GAME_OVER, GAME_ON } from '../constants';
 
 const WINNING_COMBOS = [
   [0, 1, 2], // top row, straight across
@@ -15,11 +15,11 @@ export default (board) => {
   for (let [a,b,c] of WINNING_COMBOS) {
     const owners = [board[a], board[b], board[c]].join('');
     if (owners === '111' || owners === '222') {
-      return { code: GAME_OVER, winner: board[a], combo: [a,b,c] };
+      return { status: GAME_OVER, winner: board[a], combo: [a,b,c] };
     }
   }
 
   const openCells = board.some(i => i === 0);
-  const code = openCells ? OK : GAME_OVER;
-  return { code };
+  const status = openCells ? GAME_ON : GAME_OVER;
+  return { status };
 }
