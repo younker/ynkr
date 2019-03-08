@@ -2,8 +2,8 @@ import React, { useContext, useReducer } from 'react';
 
 import Board from './Board';
 import Prompt from './Prompt';
-import { GAME_ON, GAME_ERROR, QUIT_GAME, PLAYER_ONE, PLAYER_TWO } from './constants';
-import { TerminalDispatch } from '../../Terminal';
+import { GAME_ON, GAME_ERROR, MOVE_COMPLETE, PLAYER_ONE, PLAYER_TWO, QUIT_GAME } from './constants';
+import { COMMAND_COMPLETE, TerminalDispatch } from '../../Terminal';
 import { checkBoardState, performBotMove } from './helpers';
 import './style.scss';
 
@@ -18,9 +18,8 @@ const DEFAULT_STATE = {
 };
 
 const reducer = (state, { action, ...args }) => {
-  console.log('------ TTT state, action, args:', state, action, args);
   switch(action) {
-    case 'playerMove':
+    case MOVE_COMPLETE:
       let board = [ ...state.board ];
       board[args.position] = 1;
       let outcome = checkBoardState(board);
@@ -51,11 +50,11 @@ const TicTacToe = (props) => {
 
   let prompt;
   if (state.status === QUIT_GAME) {
-    terminalDispatch({ action: 'commandComplete' });
+    terminalDispatch({ action: COMMAND_COMPLETE });
 
   } else if (state.status === GAME_ERROR) {
     prompt = <Prompt message={state.message} />
-    terminalDispatch({ action: 'commandComplete' });
+    terminalDispatch({ action: COMMAND_COMPLETE });
 
   } else {
     if (state.status === GAME_ON && state.turn === PLAYER_TWO) {

@@ -6,6 +6,10 @@ import { Input, Output } from '../TerminalRow';
 import { addPrompt, processCommand, scrollToPosition } from './helpers';
 import './style.scss';
 
+export const COMMAND_COMPLETE = 'commandComplete';
+export const NEW_COMMAND_RECEIVED = 'newCommandReceived';
+export const SCROLL = 'scroll';
+
 export const TerminalDispatch = React.createContext(null);
 
 const renderInput = ({ idx }) => (
@@ -22,13 +26,13 @@ const renderOutput = ({ idx, command, args }) => (
 
 const reducer = (state, { action, ...details }) => {
   switch (action) {
-    case 'commandComplete':
+    case COMMAND_COMPLETE:
       return addPrompt(state);
 
-    case 'newCommand':
+    case NEW_COMMAND_RECEIVED:
       return processCommand(state, details);
 
-    case 'scroll':
+    case SCROLL:
       return scrollToPosition(state, details);
 
     default:

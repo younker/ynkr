@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import React, { useContext } from 'react';
 
-import { TerminalDispatch } from '../Terminal';
+import { COMMAND_COMPLETE, TerminalDispatch } from '../Terminal';
 
 const MISSING_MANFILE = (args) => {
   if (args.length > 0) {
@@ -21,7 +21,7 @@ const Man = ({ command, args }) => {
   const payload = R.propOr(MISSING_MANFILE(args), manfile, manfiles);
 
   const terminalDispatch = useContext(TerminalDispatch);
-  terminalDispatch({ action: 'commandComplete' });
+  terminalDispatch({ action: COMMAND_COMPLETE });
 
   return <div>{payload}</div>;
 }

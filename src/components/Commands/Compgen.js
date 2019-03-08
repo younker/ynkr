@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { TerminalDispatch } from '../Terminal';
+import { COMMAND_COMPLETE, TerminalDispatch } from '../Terminal';
 import { publicCommands } from '../Commands';
 
 const Compgen = (props) => {
@@ -10,7 +10,7 @@ const Compgen = (props) => {
     .map((cmd) => (<li>{cmd}</li>));
 
   const terminalDispatch = useContext(TerminalDispatch);
-  terminalDispatch({ action: 'commandComplete' });
+  terminalDispatch({ action: COMMAND_COMPLETE });
 
   return <ul>{commands}</ul>;
 }
