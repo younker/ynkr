@@ -1,12 +1,11 @@
 import React, { useContext } from 'react';
 
-import { CELL_OWNERS, PLAYER_ONE, MOVE_COMPLETE } from '../constants';
+import { CELL_OWNERS, MOVE_COMPLETE } from '../constants';
 import { GameDispatch } from '../index';
 import './style.scss';
 
-const onClickHandler = ({ owner, turn, position, gameDispatch }) => {
-  // for now, player one is the only one that can make a move
-  if (owner || turn !== PLAYER_ONE) {
+const onClickHandler = ({ position, active, owner, turn, gameDispatch }) => {
+  if (owner || !active) {
     return;
   }
 
@@ -17,14 +16,14 @@ const onClickHandler = ({ owner, turn, position, gameDispatch }) => {
 };
 
 
-const Cell = ({ owner, turn, position, strike }) => {
+const Cell = ({ position, active, owner, turn, strike }) => {
   const gameDispatch = useContext(GameDispatch);
 
   return (
     <div
       className={'Cell ' + (strike ? 'strike' : '')}
       position={position}
-      onClick={onClickHandler({ owner, turn, position, gameDispatch })}
+      onClick={onClickHandler({ position, active, owner, turn, gameDispatch })}
     >
       { CELL_OWNERS[owner] }
     </div>

@@ -1,8 +1,15 @@
 
+const EMPTY_CELL = 0;
 export const PLAYER_ONE = 1;
 export const PLAYER_TWO = 2;
 
 export const MOVE_COMPLETE = 'moveComplete';
+
+export const CELL_VALUES = {
+  '': EMPTY_CELL,  // empty square - no owner
+  'X': PLAYER_ONE,
+  'O': PLAYER_TWO,
+};
 
 export const CELL_OWNERS = {
   0: '',  // empty square - no owner

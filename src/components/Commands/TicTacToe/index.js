@@ -2,7 +2,8 @@ import React, { useContext, useReducer } from 'react';
 
 import Board from './Board';
 import Prompt from './Prompt';
-import { GAME_ON, GAME_ERROR, MOVE_COMPLETE, PLAYER_ONE, PLAYER_TWO, QUIT_GAME } from './constants';
+import Scoreboard from './Scoreboard';
+import { GAME_ERROR, GAME_ON, MOVE_COMPLETE, PLAYER_ONE, PLAYER_TWO, QUIT_GAME } from './constants';
 import { COMMAND_COMPLETE, TerminalDispatch } from '../../Terminal';
 import { checkBoardState, performBotMove } from './helpers';
 import './style.scss';
@@ -10,7 +11,7 @@ import './style.scss';
 export const GameDispatch = React.createContext(null);
 
 const DEFAULT_STATE = {
-  status: GAME_ON,
+  status: 'newGame',
   turn: PLAYER_ONE,
   winner: undefined,
   combo: [],
@@ -20,18 +21,24 @@ const DEFAULT_STATE = {
 const reducer = (state, { action, ...args }) => {
   switch(action) {
     case MOVE_COMPLETE:
+      let { player, position } = args;
       let board = [ ...state.board ];
-      board[args.position] = 1;
+      board[position] = player;
       let outcome = checkBoardState(board);
-      return { ...state, ...outcome, board, turn: PLAYER_TWO };
+      let turn;
+      if (outcome.status === GAME_ON) {
+        turn = player === PLAYER_ONE ? PLAYER_TWO : PLAYER_ONE;
+      }
 
-    case 'botMove':
-      board = args.board;
-      outcome = checkBoardState(board);
-      return { ...state, ...outcome, board, turn: PLAYER_ONE };
+      return { ...state, ...outcome, board, turn };
+
+    // case 'botMove':
+    //   // board = args.board;
+    //   // outcome = checkBoardState(board);
+    //   // return { ...state, ...outcome, board, turn: PLAYER_ONE };
 
     case 'error':
-      return { ...state, status: GAME_ERROR, message: args.message };
+      return { ...state, status: GAME_ERROR, error: args.message };
 
     case 'restartGame':
       return DEFAULT_STATE;
@@ -53,15 +60,14 @@ const TicTacToe = (props) => {
     terminalDispatch({ action: COMMAND_COMPLETE });
 
   } else if (state.status === GAME_ERROR) {
-    prompt = <Prompt message={state.message} />
+    prompt = <Prompt error={state.error} />
     terminalDispatch({ action: COMMAND_COMPLETE });
 
   } else {
-    if (state.status === GAME_ON && state.turn === PLAYER_TWO) {
-      performBotMove(state.board, dispatch);
-    }
-
     prompt = <Prompt gameCode={state.status} winner={state.winner} />;
+    // if (state.status === GAME_ON && state.turn === PLAYER_TWO) {
+    //   performBotMove(state.board, dispatch);
+    // }
   }
 
   return (
@@ -69,10 +75,16 @@ const TicTacToe = (props) => {
       <div className="TicTacToe">
         <Board
           cells={state.board}
+          gameState={state.status}
           turn={state.turn}
           winningCombo={state.combo}
         />
         {prompt}
+        <Scoreboard
+          turn={state.turn}
+          gameState={state.status}
+          winner={state.winner}
+        />
       </div>
     </GameDispatch.Provider>
   );
