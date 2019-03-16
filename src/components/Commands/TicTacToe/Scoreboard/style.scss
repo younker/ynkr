@@ -1,0 +1,30 @@
+@import 'styles/_colors.scss';
+
+.Scoreboard {
+
+  .box {
+    display: flex;
+    flex-wrap: wrap;
+    width: 300px;
+    border: solid 1px $output-grey;
+    padding: 10px;
+
+    & > * {
+      width: 33.3333%;
+      text-align: center;
+    }
+
+    .quiet {
+      opacity: .3;
+    }
+
+    .score {
+      font-size: 2em;
+    }
+
+    .gameState {
+      &.newGame::after { content: 'Waiting'; }
+      &.gameOver::after { content: 'Game Over'; }
+    }
+  }
+}

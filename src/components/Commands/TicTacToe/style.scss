@@ -1,3 +1,12 @@
 .TicTacToe {
-  padding: 10px;
+  padding: 10px 0;
+
+  max-width: 620px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  .Board {
+    margin-bottom: 10px;
+  }
 }

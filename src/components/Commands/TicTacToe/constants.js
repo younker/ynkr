@@ -17,6 +17,7 @@ export const CELL_OWNERS = {
   2: 'O', // player 2
 };
 
+export const NEW_GAME = 'newGame';
 export const GAME_ON = 'gameOn';
 export const GAME_OVER = 'gameOver';
 export const GAME_ERROR = 'error';

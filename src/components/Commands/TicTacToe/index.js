@@ -3,7 +3,7 @@ import React, { useContext, useReducer } from 'react';
 import Board from './Board';
 import Prompt from './Prompt';
 import Scoreboard from './Scoreboard';
-import { GAME_ERROR, GAME_ON, MOVE_COMPLETE, PLAYER_ONE, PLAYER_TWO, QUIT_GAME } from './constants';
+import { NEW_GAME, GAME_ERROR, GAME_ON, MOVE_COMPLETE, PLAYER_ONE, PLAYER_TWO, QUIT_GAME } from './constants';
 import { COMMAND_COMPLETE, TerminalDispatch } from '../../Terminal';
 import { checkBoardState, performBotMove } from './helpers';
 import './style.scss';
@@ -11,7 +11,7 @@ import './style.scss';
 export const GameDispatch = React.createContext(null);
 
 const DEFAULT_STATE = {
-  status: 'newGame',
+  status: NEW_GAME,
   turn: PLAYER_ONE,
   winner: undefined,
   combo: [],
@@ -79,12 +79,14 @@ const TicTacToe = (props) => {
           turn={state.turn}
           winningCombo={state.combo}
         />
-        {prompt}
+
         <Scoreboard
           turn={state.turn}
           gameState={state.status}
           winner={state.winner}
         />
+
+        {prompt}
       </div>
     </GameDispatch.Provider>
   );

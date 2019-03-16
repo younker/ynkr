@@ -1,0 +1,7 @@
+.PlayerTurn {
+  font-size: 1.2em;
+
+  &.active {
+    text-decoration: underline;
+  }
+}

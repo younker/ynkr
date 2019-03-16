@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Cell from '../Cell';
-import { GAME_ON } from '../constants';
+import { NEW_GAME, GAME_ON } from '../constants';
 import './style.scss';
 
 const Board = ({ cells, gameState, turn, winningCombo }) => {
@@ -9,7 +9,7 @@ const Board = ({ cells, gameState, turn, winningCombo }) => {
     <Cell
       key={i}
       position={i}
-      active={gameState === GAME_ON || gameState === 'newGame'}
+      active={gameState === GAME_ON || gameState === NEW_GAME}
       owner={owner}
       turn={turn}
       strike={winningCombo.includes(i)}

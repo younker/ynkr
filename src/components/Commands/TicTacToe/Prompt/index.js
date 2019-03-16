@@ -39,24 +39,18 @@ const onKeyUpHandler = ({ gameDispatch, gameOver }) => {
   };
 };
 
-const Prompt = ({ message, gameCode, winner }) => {
+const Prompt = ({ error, gameCode }) => {
   const gameDispatch = useContext(GameDispatch);
 
   const gameOver = gameCode === 'gameOver';
 
   let output;
-  if (message) {
-    output = message;
-
+  if (error) {
+    output = error;
   } else if (gameOver) {
-    if (!winner) {
-      output = 'Draw! Play again? [y,n]';
-    } else {
-      output = `${CELL_OWNERS[winner]} Wins! Play again? [y,n]`;
-    }
-
+    output = 'Play again? [y,n] ';
   } else {
-    output = `Options: [r,q]`;
+    output = 'Options: [r,q] ';
   }
 
   return (
