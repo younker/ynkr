@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-import { CELL_OWNERS } from '../constants';
 import { GameDispatch } from '../index';
 import './style.scss';
 

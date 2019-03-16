@@ -1,6 +1,8 @@
 import retryable from '../../../../util/http/retryable';
 import getRequester from '../../../../util/http/requester';
 
+import { MOVE_COMPLETE, PLAYER_TWO } from '../constants';
+
 const GATEWAY_API_HOST = 'https://vpppfv00l4.execute-api.us-east-1.amazonaws.com';
 
 // Retry at least once. This is because the timeout is only 2s and for a cold
@@ -30,7 +32,7 @@ const handleResponse = (dispatch) => {
 
     } else {
       const board = data.board;
-      dispatch({ action: 'botMove', board });
+      dispatch({ action: MOVE_COMPLETE, player: PLAYER_TWO, board });
     }
   };
 };

@@ -3,7 +3,7 @@ import React, { useContext, useReducer } from 'react';
 import Board from './Board';
 import Prompt from './Prompt';
 import Scoreboard from './Scoreboard';
-import { NEW_GAME, GAME_ERROR, GAME_ON, MOVE_COMPLETE, PLAYER_ONE, PLAYER_TWO, QUIT_GAME } from './constants';
+import { BOT, HUMAN, NEW_GAME, GAME_ERROR, GAME_ON, MOVE_COMPLETE, PLAYER_ONE, PLAYER_TWO, QUIT_GAME } from './constants';
 import { COMMAND_COMPLETE, TerminalDispatch } from '../../Terminal';
 import { checkBoardState, performBotMove } from './helpers';
 import './style.scss';
@@ -11,19 +11,24 @@ import './style.scss';
 export const GameDispatch = React.createContext(null);
 
 const DEFAULT_STATE = {
+  board: [0,0,0,0,0,0,0,0,0],
   status: NEW_GAME,
   turn: PLAYER_ONE,
+  opponent: BOT,
   winner: undefined,
   combo: [],
-  board: [0,0,0,0,0,0,0,0,0],
 };
 
 const reducer = (state, { action, ...args }) => {
   switch(action) {
     case MOVE_COMPLETE:
-      let { player, position } = args;
-      let board = [ ...state.board ];
-      board[position] = player;
+      // the bot updates with the board, a player updates based on the cell
+      // that was clicked.
+      let { player, position, board } = args;
+      if (!board) {
+        board = [ ...state.board ];
+        board[position] = player;
+      }
       let outcome = checkBoardState(board);
       let turn;
       if (outcome.status === GAME_ON) {
@@ -31,11 +36,6 @@ const reducer = (state, { action, ...args }) => {
       }
 
       return { ...state, ...outcome, board, turn };
-
-    // case 'botMove':
-    //   // board = args.board;
-    //   // outcome = checkBoardState(board);
-    //   // return { ...state, ...outcome, board, turn: PLAYER_ONE };
 
     case 'error':
       return { ...state, status: GAME_ERROR, error: args.message };
@@ -51,8 +51,13 @@ const reducer = (state, { action, ...args }) => {
   }
 };
 
-const TicTacToe = (props) => {
-  const [state, dispatch] = useReducer(reducer, DEFAULT_STATE);
+const TicTacToe = ({ args }) => {
+  let initialState = { ...DEFAULT_STATE };
+  if (args[0] === '--vs' && args[1].toUpperCase() === HUMAN) {
+    initialState.vs = HUMAN;
+  }
+
+  const [state, dispatch] = useReducer(reducer, initialState);
   const terminalDispatch = useContext(TerminalDispatch);
 
   let prompt;
@@ -65,9 +70,10 @@ const TicTacToe = (props) => {
 
   } else {
     prompt = <Prompt gameCode={state.status} winner={state.winner} />;
-    // if (state.status === GAME_ON && state.turn === PLAYER_TWO) {
-    //   performBotMove(state.board, dispatch);
-    // }
+
+    if (state.status === GAME_ON && state.vs === 'BOT' && state.turn === PLAYER_TWO) {
+      performBotMove(state.board, dispatch);
+    }
   }
 
   return (
