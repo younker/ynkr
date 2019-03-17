@@ -65,8 +65,9 @@ const Input = () => {
       </Col>
       <Col className='input'>
         <input
-          ref={inputRef}
           type='text'
+          autocomplete='off'
+          ref={inputRef}
           autoFocus={!state.readonly}
           onKeyUp={onKeyUpHandler(state, setState, dispatch, inputRef)}
           readOnly={state.readonly}
