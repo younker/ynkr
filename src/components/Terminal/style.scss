@@ -3,4 +3,8 @@
 .Terminal {
   font-family: Inconsolata, monospace;
   color: $cmd-line-grey;
+
+  pre {
+    color: $cmd-line-grey;
+  }
 }

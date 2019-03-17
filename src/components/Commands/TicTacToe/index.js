@@ -2,6 +2,7 @@ import React, { useContext, useReducer } from 'react';
 
 import Board from './Board';
 import Prompt from './Prompt';
+import HelpPage from './HelpPage';
 import Scoreboard from './Scoreboard';
 import { BOT, HUMAN, NEW_GAME, GAME_ERROR, GAME_ON, MOVE_COMPLETE, PLAYER_ONE, PLAYER_TWO, QUIT_GAME } from './constants';
 import { COMMAND_COMPLETE, TerminalDispatch } from '../../Terminal';
@@ -67,6 +68,12 @@ const botsTurn = ({ status, opponent, turn }) => (
 
 const TicTacToe = ({ args }) => {
   const terminalDispatch = useContext(TerminalDispatch);
+
+  if (args['h'] || args['help']) {
+    terminalDispatch({ action: COMMAND_COMPLETE });
+    return <HelpPage />;
+  }
+
   const [state, dispatch] = useReducer(reducer, getInitialState(args));
 
   let prompt;
