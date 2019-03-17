@@ -51,14 +51,23 @@ const reducer = (state, { action, ...args }) => {
   }
 };
 
-const TicTacToe = ({ args }) => {
-  let initialState = { ...DEFAULT_STATE };
-  if (args[0] === '--vs' && args[1].toUpperCase() === HUMAN) {
-    initialState.vs = HUMAN;
+const getInitialState = (cmdLineArgs) => {
+  let state = { ...DEFAULT_STATE };
+
+  if (cmdLineArgs['vs'] === HUMAN) {
+    state['opponent'] = HUMAN;
   }
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+  return state;
+};
+
+const botsTurn = ({ status, opponent, turn }) => (
+  status === GAME_ON && opponent === BOT && turn === PLAYER_TWO
+);
+
+const TicTacToe = ({ args }) => {
   const terminalDispatch = useContext(TerminalDispatch);
+  const [state, dispatch] = useReducer(reducer, getInitialState(args));
 
   let prompt;
   if (state.status === QUIT_GAME) {
@@ -71,7 +80,7 @@ const TicTacToe = ({ args }) => {
   } else {
     prompt = <Prompt gameCode={state.status} winner={state.winner} />;
 
-    if (state.status === GAME_ON && state.vs === 'BOT' && state.turn === PLAYER_TWO) {
+    if (botsTurn(state)) {
       performBotMove(state.board, dispatch);
     }
   }
