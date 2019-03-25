@@ -1,8 +1,8 @@
 export const PLAYER_ONE = 1;
 export const PLAYER_TWO = 2;
 
-export const HUMAN = 'human';
 export const BOT = 'bot';
+export const HUMAN = 'human';
 
 export const MOVE_COMPLETE = 'moveComplete';
 

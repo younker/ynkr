@@ -22,7 +22,7 @@
     "test": "mocha --require @babel/register ./test",
     "test:watch": "mocha --require @babel/register --watch ./test",
     "eject": "react-scripts eject",
-    "deploy": "npm run build && aws s3 sync ./build s3://ynkr"
+    "deploy": "npm run build && aws s3 sync ./build s3://ynkr.org"
   },
   "eslintConfig": {
     "extends": "react-app"

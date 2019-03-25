@@ -4,6 +4,7 @@ import Board from './Board';
 import Prompt from './Prompt';
 import HelpPage from './HelpPage';
 import Scoreboard from './Scoreboard';
+import parseArgs from '../../../util/parse-args';
 import { BOT, HUMAN, NEW_GAME, GAME_ERROR, GAME_ON, MOVE_COMPLETE, PLAYER_ONE, PLAYER_TWO, QUIT_GAME } from './constants';
 import { COMMAND_COMPLETE, TerminalDispatch } from '../../Terminal';
 import { checkBoardState, performBotMove } from './helpers';
@@ -15,7 +16,8 @@ const DEFAULT_STATE = {
   board: [0,0,0,0,0,0,0,0,0],
   status: NEW_GAME,
   turn: PLAYER_ONE,
-  opponent: BOT,
+  playerOne: undefined,
+  playerTwo: undefined,
   winner: undefined,
   combo: [],
 };
@@ -52,19 +54,27 @@ const reducer = (state, { action, ...args }) => {
   }
 };
 
-const getInitialState = (cmdLineArgs) => {
+// tic-tac-toe --player-one bot
+const getInitialState = ({ args }) => {
   let state = { ...DEFAULT_STATE };
+  const parsed = parseArgs(args);
 
-  if (cmdLineArgs['vs'] === HUMAN) {
-    state['opponent'] = HUMAN;
+  let p1 = HUMAN;
+  if (parsed['--player-one'] === BOT) {
+    p1 = BOT;
   }
+  state['playerOne'] = p1;
+
+  let p2 = BOT;
+  if (!parsed['--player-two'] && p1 === BOT) {
+    p2 = HUMAN;
+  } else if (parsed['--player-two'] === HUMAN) {
+    p2 = HUMAN;
+  }
+  state['playerTwo'] = p2;
 
   return state;
 };
-
-const botsTurn = ({ status, opponent, turn }) => (
-  status === GAME_ON && opponent === BOT && turn === PLAYER_TWO
-);
 
 const TicTacToe = ({ args }) => {
   const terminalDispatch = useContext(TerminalDispatch);
@@ -87,7 +97,12 @@ const TicTacToe = ({ args }) => {
   } else {
     prompt = <Prompt gameCode={state.status} winner={state.winner} />;
 
-    if (botsTurn(state)) {
+    console.log('------ state:', state);
+    const gameActive = state.status === GAME_ON || state.status === NEW_GAME;
+    const botTurn = (state.turn ===1 && state.playerOne === BOT) ||
+      (state.turn === 2 && state.playerTwo === BOT);
+
+    if (gameActive && botTurn) {
       performBotMove(state.board, dispatch);
     }
   }
