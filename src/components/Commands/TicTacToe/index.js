@@ -4,7 +4,6 @@ import Board from './Board';
 import Prompt from './Prompt';
 import HelpPage from './HelpPage';
 import Scoreboard from './Scoreboard';
-import parseArgs from '../../../util/parse-args';
 import { BOT, HUMAN, NEW_GAME, GAME_ERROR, GAME_ON, MOVE_COMPLETE, PLAYER_ONE, PLAYER_TWO, QUIT_GAME } from './constants';
 import { COMMAND_COMPLETE, TerminalDispatch } from '../../Terminal';
 import { checkBoardState, performBotMove } from './helpers';
@@ -55,20 +54,19 @@ const reducer = (state, { action, ...args }) => {
 };
 
 // tic-tac-toe --player-one bot
-const getInitialState = ({ args }) => {
+const getInitialState = (args) => {
   let state = { ...DEFAULT_STATE };
-  const parsed = parseArgs(args);
 
   let p1 = HUMAN;
-  if (parsed['--player-one'] === BOT) {
+  if (args['player-one'] === BOT) {
     p1 = BOT;
   }
   state['playerOne'] = p1;
 
   let p2 = BOT;
-  if (!parsed['--player-two'] && p1 === BOT) {
+  if (!args['player-two'] && p1 === BOT) {
     p2 = HUMAN;
-  } else if (parsed['--player-two'] === HUMAN) {
+  } else if (args['player-two'] === HUMAN) {
     p2 = HUMAN;
   }
   state['playerTwo'] = p2;
@@ -97,7 +95,6 @@ const TicTacToe = ({ args }) => {
   } else {
     prompt = <Prompt gameCode={state.status} winner={state.winner} />;
 
-    console.log('------ state:', state);
     const gameActive = state.status === GAME_ON || state.status === NEW_GAME;
     const botTurn = (state.turn ===1 && state.playerOne === BOT) ||
       (state.turn === 2 && state.playerTwo === BOT);
