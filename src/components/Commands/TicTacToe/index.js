@@ -77,6 +77,16 @@ const getInitialState = (args) => {
   return state;
 };
 
+const isBotsTurn = ({ status, turn, playerOne, playerTwo }) => {
+  const moveIsRequired = status === GAME_ON || status === NEW_GAME;
+  if (!moveIsRequired) {
+    return false;
+  }
+
+  return (turn === 1 && playerOne === BOT) ||
+    (turn === 2 && playerTwo === BOT);
+};
+
 const TicTacToe = ({ args }) => {
   const terminalDispatch = useContext(TerminalDispatch);
 
@@ -97,12 +107,7 @@ const TicTacToe = ({ args }) => {
 
   } else {
     prompt = <Prompt gameCode={state.status} winner={state.winner} />;
-
-    const gameActive = state.status === GAME_ON || state.status === NEW_GAME;
-    const botTurn = (state.turn ===1 && state.playerOne === BOT) ||
-      (state.turn === 2 && state.playerTwo === BOT);
-
-    if (gameActive && botTurn) {
+    if (isBotsTurn(state)) {
       performBotMove(state.board, dispatch);
     }
   }
