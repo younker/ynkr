@@ -15,14 +15,12 @@ const onClickHandler = ({ cellIdx, active, owner, turn, gameDispatch }) => {
   }
 };
 
-
 const Cell = ({ cellIdx, active, owner, turn, strike }) => {
   const gameDispatch = useContext(GameDispatch);
 
   return (
     <div
       className={'Cell ' + (strike ? 'strike' : '')}
-      cellIdx={cellIdx}
       onClick={onClickHandler({ cellIdx, active, owner, turn, gameDispatch })}
     >
       { CELL_OWNERS[owner] }
