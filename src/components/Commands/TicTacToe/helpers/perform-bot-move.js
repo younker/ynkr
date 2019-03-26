@@ -18,7 +18,7 @@ const REQUEST_SPEC = {
 };
 
 const makeRequest = async (board) => {
-  const body = `{"player": 2, board": [${board.toString()}]}`;
+  const body = `{"player": 2, "board": [${board.toString()}]}`;
   const { requester } = getRequester(REQUEST_SPEC, { body });
   return await retryable(requester, { times: MAX_RETRIES });
 };
