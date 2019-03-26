@@ -19,7 +19,7 @@ const DEFAULT_STATE = {
   playerOne: undefined,
   playerTwo: undefined,
   winner: undefined,
-  combo: [],
+  winningCombo: [],
 };
 
 const reducer = (state, { action, ...args }) => {
@@ -27,10 +27,10 @@ const reducer = (state, { action, ...args }) => {
     case MOVE_COMPLETE:
       // the bot updates with the board, a player updates based on the cell
       // that was clicked.
-      let { player, position, board } = args;
+      let { player, cellIdx, board } = args;
       if (!board) {
         board = [ ...state.board ];
-        board[position] = player;
+        board[cellIdx] = player;
       }
       let outcome = checkBoardState(board);
       let turn;
@@ -114,7 +114,7 @@ const TicTacToe = ({ args }) => {
           cells={state.board}
           gameState={state.status}
           turn={state.turn}
-          winningCombo={state.combo}
+          winningCombo={state.winningCombo}
         />
 
         <Scoreboard

@@ -15,7 +15,7 @@ export default (board) => {
   for (let [a,b,c] of WINNING_COMBOS) {
     const owners = [board[a], board[b], board[c]].join('');
     if (owners === '111' || owners === '222') {
-      return { status: GAME_OVER, winner: board[a], combo: [a,b,c] };
+      return { status: GAME_OVER, winner: board[a], winningCombo: [a,b,c] };
     }
   }
 

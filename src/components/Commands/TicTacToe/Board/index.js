@@ -8,7 +8,7 @@ const Board = ({ cells, gameState, turn, winningCombo }) => {
   const createCell = (owner, i) => (
     <Cell
       key={i}
-      position={i}
+      cellIdx={i}
       active={gameState === GAME_ON || gameState === NEW_GAME}
       owner={owner}
       turn={turn}
