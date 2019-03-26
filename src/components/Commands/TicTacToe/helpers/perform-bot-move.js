@@ -1,7 +1,7 @@
 import retryable from '../../../../util/http/retryable';
 import getRequester from '../../../../util/http/requester';
 
-import { MOVE_COMPLETE } from '../constants';
+import { GAME_ERROR, MOVE_COMPLETE } from '../constants';
 
 const GATEWAY_API_HOST = 'https://api.ynkr.org';
 
@@ -28,7 +28,7 @@ const handleResponse = (dispatch) => {
     if (error) {
       const message = 'HTTP Request to AWS Gateway endpoint failed ' +
         ` with: [${error.status}] ${error.code} - ${error.message}`;
-      dispatch({ action: 'error', message });
+      dispatch({ action: GAME_ERROR, message });
 
     } else {
       const board = data.board;

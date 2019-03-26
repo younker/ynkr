@@ -4,7 +4,10 @@ import Board from './Board';
 import Prompt from './Prompt';
 import HelpPage from './HelpPage';
 import Scoreboard from './Scoreboard';
-import { BOT, HUMAN, NEW_GAME, GAME_ERROR, GAME_ON, MOVE_COMPLETE, PLAYER_ONE, PLAYER_TWO, QUIT_GAME } from './constants';
+import {
+  BOT, GAME_ERROR, GAME_ON, HUMAN, MOVE_COMPLETE, NEW_GAME, PLAYER_ONE,
+  PLAYER_TWO, QUIT_GAME, RESTART_GAME,
+} from './constants';
 import { COMMAND_COMPLETE, TerminalDispatch } from '../../Terminal';
 import { checkBoardState, performBotMove } from './helpers';
 import './style.scss';
@@ -39,13 +42,13 @@ const reducer = (state, { action, ...args }) => {
 
       return { ...state, ...outcome, board, turn };
 
-    case 'error':
+    case GAME_ERROR:
       return { ...state, status: GAME_ERROR, error: args.message };
 
-    case 'restartGame':
+    case RESTART_GAME:
       return DEFAULT_STATE;
 
-    case 'quitGame':
+    case QUIT_GAME:
       return { ...state, status: QUIT_GAME };
 
     default:

@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
+import { GAME_OVER, QUIT_GAME, RESTART_GAME } from '../constants';
 import { GameDispatch } from '../index';
 import './style.scss';
 
@@ -10,23 +11,23 @@ const onKeyUpHandler = ({ gameDispatch, gameOver }) => {
     switch (e.keyCode) {
       case 82: // r[estart]
         e.currentTarget.value = ''
-        gameDispatch({ action: 'restartGame' });
+        gameDispatch({ action: RESTART_GAME });
         break;
 
       case 81: // q[uit]
-        gameDispatch({ action: 'quitGame' });
+        gameDispatch({ action: QUIT_GAME });
         break;
 
       case 89: // y[es] (play again?)
         if (gameOver) {
           e.currentTarget.value = ''
-          gameDispatch({ action: 'restartGame' });
+          gameDispatch({ action: RESTART_GAME });
         }
         break;
 
       case 78: // n[o] (play again?)
         if (gameOver) {
-          gameDispatch({ action: 'quitGame' });
+          gameDispatch({ action: QUIT_GAME });
         }
         break;
 
@@ -41,7 +42,7 @@ const onKeyUpHandler = ({ gameDispatch, gameOver }) => {
 const Prompt = ({ error, gameCode }) => {
   const gameDispatch = useContext(GameDispatch);
 
-  const gameOver = gameCode === 'gameOver';
+  const gameOver = gameCode === GAME_OVER;
 
   let output;
   if (error) {

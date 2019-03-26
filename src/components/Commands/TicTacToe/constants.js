@@ -17,3 +17,4 @@ export const GAME_ON = 'gameOn';
 export const GAME_OVER = 'gameOver';
 export const GAME_ERROR = 'error';
 export const QUIT_GAME = 'quitGame';
+export const RESTART_GAME = 'restartGame';
