@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import GameSummary from './GameSummary'
 import PlayerTurn from './PlayerTurn';
 import Timer from '../../../Timer';
-import { PLAYER_ONE, PLAYER_TWO, NEW_GAME, GAME_OVER, QUIT_GAME } from '../constants';
+import { PLAYER_ONE, PLAYER_TWO, NEW_GAME, GAME_OVER, GAME_ON } from '../constants';
 import './style.scss';
 
 const DEFAULT_STATE = {
@@ -16,10 +16,10 @@ const timerArgs = (gameState, turn, player) => {
   let action;
   if (gameState === NEW_GAME) {
     action = 'reset';
-  } else if (gameState === QUIT_GAME) {
-    action = 'pause';
-  } else {
+  } else if (gameState === GAME_ON) {
     action = turn === player ? 'run' : 'pause';
+  } else {
+    action = 'pause';
   }
   return { action };
 };
