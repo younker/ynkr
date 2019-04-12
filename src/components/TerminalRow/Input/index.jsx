@@ -1,4 +1,3 @@
-import * as R from 'ramda';
 import React, { useContext, useState, useRef } from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -20,8 +19,7 @@ const onKeyUpHandler = (state, setState, dispatch, inputRef) => {
   return (e) => {
     switch (e.keyCode) {
       case 13: // enter
-        const [command, ...args] = R.map(R.trim, e.target.value.split(' '));
-        dispatch({ action: NEW_COMMAND_RECEIVED, command, args });
+        dispatch({ action: NEW_COMMAND_RECEIVED, command: e.target.value });
         setState({ ...state, readonly: true });
         break;
 

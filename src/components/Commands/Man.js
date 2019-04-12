@@ -3,9 +3,9 @@ import React, { useContext } from 'react';
 
 import { COMMAND_COMPLETE, TerminalDispatch } from '../Terminal';
 
-const MISSING_MANFILE = (args) => {
-  if (args.length > 0) {
-    return `No manual entry for ${args.join(' ')}`;
+const MISSING_MANFILE = (manfile) => {
+  if (manfile) {
+    return `No manual entry for ${manfile}`;
   }
 
   return 'What manual page do you want?';
@@ -17,8 +17,8 @@ const manfiles = {
 };
 
 const Man = ({ command, args }) => {
-  const manfile = args[0];
-  const payload = R.propOr(MISSING_MANFILE(args), manfile, manfiles);
+  const manfile = args['subCommand'];
+  const payload = R.propOr(MISSING_MANFILE(manfile), manfile, manfiles);
 
   const terminalDispatch = useContext(TerminalDispatch);
   terminalDispatch({ action: COMMAND_COMPLETE });

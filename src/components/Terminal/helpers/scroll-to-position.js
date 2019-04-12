@@ -1,8 +1,6 @@
-import { trim } from 'ramda';
-
 const extractCommandHistoryFromState = ({ collection }) => {
   return collection
-    .map(({ command, args }) => trim([command, args].join(' ')))
+    .map(({ original }) => original)
     .reduce((acc, el) => {
       if (el) { acc.push(el); }
       return acc;

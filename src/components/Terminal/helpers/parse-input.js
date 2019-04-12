@@ -1,15 +1,18 @@
+import * as R from 'ramda';
+
 const stripPrependingDashes = s => s.replace(/^-+/, '');
 
-export default (args = []) => {
+const parseArguments = (args) => {
+  if (!args) {
+    return;
+  }
+
   let parsed = {};
   for (let i = 0; i < args.length; i++) {
     const key = args[i];
     const next = args[i + 1];
-    if (key.substr(0, 1) !== '-') {
-      // invalid arg. just ignore it for now. However, in the future we might
-      // accept something like:
-      //   $ command sub-command --help
-      // In which case this block would be required
+    if (i === 0 && key.substr(0, 1) !== '-') {
+      parsed['subCommand'] = key;
     } else if (!next || next.substr(0,1) === '-') {
       // The next entry is an arg which means this is a flag. Default to true
       const clean = stripPrependingDashes(key);
@@ -21,4 +24,10 @@ export default (args = []) => {
     }
   }
   return parsed;
+};
+
+export default (input) => {
+  const [command, ...rawArgs] = R.map(R.trim, input.split(' '));
+  const args = parseArguments(rawArgs);
+  return { command, args };
 };
