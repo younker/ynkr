@@ -17,8 +17,8 @@ const REQUEST_SPEC = {
   body: undefined,
 };
 
-const makeRequest = async (board) => {
-  const body = `{"player": 2, "board": [${board.toString()}]}`;
+const makeRequest = async ({ board, player }) => {
+  const body = JSON.stringify({ board, player });
   const { requester } = getRequester(REQUEST_SPEC, { body });
   return await retryable(requester, { times: MAX_RETRIES });
 };
@@ -37,4 +37,4 @@ const handleResponse = (dispatch) => {
   };
 };
 
-export default (board, dispatch) => makeRequest(board).then(handleResponse(dispatch));
+export default ({ dispatch, ...body }) => makeRequest(body).then(handleResponse(dispatch));

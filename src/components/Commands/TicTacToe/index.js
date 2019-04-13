@@ -15,7 +15,7 @@ import './style.scss';
 export const GameDispatch = React.createContext(null);
 
 const DEFAULT_STATE = {
-  board: [0,0,0,0,0,0,0,0,0],
+  board: [0, 0, 0, 0, 0, 0, 0, 0, 0],
   status: NEW_GAME,
   turn: PLAYER_ONE,
   playerOne: undefined,
@@ -37,7 +37,7 @@ const reducer = (state, { action, ...args }) => {
       let outcome = checkBoardState(board);
       let turn;
       if (outcome.status === GAME_ON) {
-        turn = player === PLAYER_ONE ? PLAYER_TWO : PLAYER_ONE;
+        turn = state.turn === PLAYER_ONE ? PLAYER_TWO : PLAYER_ONE;
       }
 
       return { ...state, ...outcome, board, turn };
@@ -46,7 +46,8 @@ const reducer = (state, { action, ...args }) => {
       return { ...state, status: GAME_ERROR, error: args.message };
 
     case RESTART_GAME:
-      return DEFAULT_STATE;
+      const { playerOne, playerTwo } = state;
+      return { ...DEFAULT_STATE, playerOne, playerTwo };
 
     case QUIT_GAME:
       return { ...state, status: QUIT_GAME };
@@ -108,7 +109,7 @@ const TicTacToe = ({ args }) => {
   } else {
     prompt = <Prompt gameCode={state.status} winner={state.winner} />;
     if (isBotsTurn(state)) {
-      performBotMove(state.board, dispatch);
+      performBotMove({ dispatch, board: state.board, player: state.turn });
     }
   }
 
