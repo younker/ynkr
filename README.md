@@ -1,8 +1,6 @@
 # YNKR
 
-~http://ynkr.org~ Actually, until I update DNS, we are living at [ynkr.s3](http://ynkr.s3-website.us-east-2.amazonaws.com/)
-
-## Note To Self
+**Note To Self**
 
 Dear Future Self,
 
@@ -23,6 +21,7 @@ Your Friend,
 Jason Younker
 
 ## TODO
+- [ ] bug: if you `tic-tac-toe --player-one bot`, you can click while it's the bots turn
 - [ ] allow double-click (select) -> copy. Right now `App`'s `useEffect` steals focus
 - [ ] command line:
   - [ ] auto-complete
