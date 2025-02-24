@@ -1,5 +1,7 @@
-@import 'styles/_colors.scss';
+@use 'src/styles/colors' as c;
 
 .Welcome {
-  pre { color: $cmd-line-grey; }
+  pre {
+    color: c.$cmd-line-grey;
+  }
 }

@@ -6,7 +6,7 @@ import { GAME_ERROR, MOVE_COMPLETE } from '../constants';
 const GATEWAY_API_HOST = 'https://api.ynkr.org';
 
 // Retry at least once. This is because the timeout is only 2s and for a cold
-// lamda call, the startup time plus a full scan can cause a timeout
+// lambda call, the startup time plus a full scan can cause a timeout
 const MAX_RETRIES = 2;
 
 const REQUEST_SPEC = {

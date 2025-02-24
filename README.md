@@ -29,3 +29,20 @@ Jason Younker
   - [ ] clear
 - [ ] hook up ci
 - [ ] [dotenv-extended](https://www.npmjs.com/package/dotenv-extended)
+
+## Jest Issue
+
+After the upgrade, I was running into the following error:
+
+> Jest encountered an unexpected token
+> Jest failed to parse a file...
+>     Details:
+>     /Users/jasonyounker/projects/ynkr/node_modules/axios/index.js: 1
+>     SyntaxError: Cannot use import statement outside a module
+>     4 | } from 'rambda';
+>     5 |
+> > 6 | import axios from 'axios';
+
+Axios issue [#5158](https://github.com/axios/axios/issues/5185) sent me to issue [#5026](https://github.com/axios/axios/issues/5026) which pointed me to [this SO answer](https://stackoverflow.com/questions/73958968/cannot-use-import-statement-outside-a-module-with-axios/74297004#74297004). The result was the `"jest"` section in `package.json`. Since I cannot leave a note there, I am leaving it here.
+
+Note that I could fix it by altering how we execute the tests from `react-scripts test` to `jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom"` (this could also go into the jest config file). However, bypassing `react-scripts` means we didn't get helpful ergonomics (eg watch).

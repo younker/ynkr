@@ -1,9 +1,9 @@
-import * as R from 'ramda';
+import { pathOr } from 'rambda';
 
 // We are stage-less (other than test) so this should work
 const DEFAULT_ENV = 'production';
 
-const NORMALIZED_ENV = R.pathOr(DEFAULT_ENV, ['env', 'NODE_ENV'], process).toLowerCase();
+const NORMALIZED_ENV = pathOr(DEFAULT_ENV, ['env', 'NODE_ENV'], process.env).toLowerCase();
 
 // By using this predicate internally and exposing functions with 0 arity, we
 // we reduce the liklihood of errors such as the following:
@@ -13,7 +13,9 @@ const NORMALIZED_ENV = R.pathOr(DEFAULT_ENV, ['env', 'NODE_ENV'], process).toLow
 //   false
 const isEnv = (env) => NORMALIZED_ENV === env;
 
-export default {
+const env = {
   isTest: isEnv('test'),
   isProd: isEnv('production'),
 };
+
+export default env;

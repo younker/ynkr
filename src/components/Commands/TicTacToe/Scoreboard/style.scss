@@ -1,15 +1,14 @@
-@import 'styles/_colors.scss';
+@use 'src/styles/colors' as c;
 
 .Scoreboard {
-
   .box {
     display: flex;
     flex-wrap: wrap;
     width: 300px;
-    border: solid 1px $output-grey;
+    border: solid 1px c.$output-grey;
     padding: 10px;
 
-    & > * {
+    &>* {
       width: 33.3333%;
       text-align: center;
     }
@@ -23,8 +22,13 @@
     }
 
     .gameState {
-      &.newGame::after { content: 'Waiting'; }
-      &.gameOver::after { content: 'Game Over'; }
+      &.newGame::after {
+        content: 'Waiting';
+      }
+
+      &.gameOver::after {
+        content: 'Game Over';
+      }
     }
   }
 }

@@ -25,13 +25,13 @@ const DEFAULT_STATE = {
 };
 
 const reducer = (state, { action, ...args }) => {
-  switch(action) {
+  switch (action) {
     case MOVE_COMPLETE:
       // the bot updates with the board, a player updates based on the cell
       // that was clicked.
       let { player, cellIdx, board } = args;
       if (!board) {
-        board = [ ...state.board ];
+        board = [...state.board];
         board[cellIdx] = player;
       }
       let outcome = checkBoardState(board);
@@ -89,14 +89,13 @@ const isBotsTurn = ({ status, turn, playerOne, playerTwo }) => {
 };
 
 const TicTacToe = ({ args }) => {
+  const [state, dispatch] = useReducer(reducer, getInitialState(args));
   const terminalDispatch = useContext(TerminalDispatch);
 
   if (args['h'] || args['help']) {
     terminalDispatch({ action: COMMAND_COMPLETE });
     return <HelpPage />;
   }
-
-  const [state, dispatch] = useReducer(reducer, getInitialState(args));
 
   let prompt;
   if (state.status === QUIT_GAME) {
