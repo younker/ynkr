@@ -1,4 +1,4 @@
-import * as R from 'ramda';
+import { map, trim } from 'rambda';
 
 const stripPrependingDashes = s => s.replace(/^-+/, '');
 
@@ -13,7 +13,7 @@ const parseArguments = (args) => {
     const next = args[i + 1];
     if (i === 0 && key.substr(0, 1) !== '-') {
       parsed['subCommand'] = key;
-    } else if (!next || next.substr(0,1) === '-') {
+    } else if (!next || next.substr(0, 1) === '-') {
       // The next entry is an arg which means this is a flag. Default to true
       const clean = stripPrependingDashes(key);
       parsed[clean] = true;
@@ -27,7 +27,7 @@ const parseArguments = (args) => {
 };
 
 export default (input) => {
-  const [command, ...rawArgs] = R.map(R.trim, input.split(' '));
+  const [command, ...rawArgs] = map(trim, input.split(' '));
   const args = parseArguments(rawArgs);
   return { command, args };
 };

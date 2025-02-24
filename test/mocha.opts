@@ -1,5 +1,0 @@
---require @babel/polyfill
---reporter spec
---recursive
---require test/setup.js
---exit

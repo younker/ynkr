@@ -1,7 +1,10 @@
-import * as R from 'ramda';
+import {
+  difference, isEmpty, isNil, join, keys, map, merge, pathOr, pick, pickBy,
+  prop, propOr, reduce, reject, toString
+} from 'rambda';
+
 import axios from 'axios';
-import pathToRegex from 'path-to-regexp';
-import { stringify } from 'query-string';
+import { compile } from 'path-to-regexp';
 
 import logger from '../logger';
 import { getCodeForStatus, getStatusForCode } from './status-codes';
@@ -28,13 +31,13 @@ const invalidArgumentError = (argument, value) => ({
 const compilePathError = ({ message }) => ({ code: 'COMPILE_PATH_ERROR', message });
 
 function buildPath(path, args) {
-  if (R.isNil(path)) {
+  if (isNil(path)) {
     return { error: missingArgumentError('path') };
   }
 
   let compiled;
   try {
-    compiled = pathToRegex.compile(path)(args);
+    compiled = compile(path)(args);
   } catch (e) {
     return { error: compilePathError(e) };
   }
@@ -43,8 +46,8 @@ function buildPath(path, args) {
     return { error: invalidArgumentError('path', path) };
   }
 
-  const qp = stringify(R.propOr(undefined, 'queryParams', args));
-  if (!R.isEmpty(qp)) {
+  const qp = new URLSearchParams(propOr(undefined, 'queryParams', args));
+  if (!isEmpty(qp)) {
     compiled = `${compiled}?${qp}`;
   }
 
@@ -56,12 +59,12 @@ function buildPath(path, args) {
 // around existence as this primarily is focused around strings. If we
 // introduce objects, the acceptance criteria may change and this will need
 // to be revisited.
-const argIsPresent = (val) => !R.isNil(val);
+const argIsPresent = (val) => !isNil(val);
 
 function extractRequestArgsFromSpec(spec) {
-  const validArgs = R.pickBy(argIsPresent, spec);
-  const missing = R.difference(REQUIRE_HTTP_REQUEST_ARGS, R.keys(validArgs));
-  const errors = R.reduce((acc, arg) => [...acc, missingArgumentError(arg)], [], missing);
+  const validArgs = pickBy(argIsPresent, spec);
+  const missing = difference(REQUIRE_HTTP_REQUEST_ARGS, keys(validArgs));
+  const errors = reduce((acc, arg) => [...acc, missingArgumentError(arg)], [], missing);
   return { errors, requestArgs: validArgs };
 }
 
@@ -81,10 +84,11 @@ function logRequest(details) {
 }
 
 const getStatusFromException = (e) => {
-  return R.pathOr(getStatusForCode('INTERNAL_SERVER_ERROR'), ['response', 'status'], e);
+  return pathOr(getStatusForCode('INTERNAL_SERVER_ERROR'), ['response', 'status'], e);
 };
 
 async function performHttpRequest({ specId, resource, method, url, body, endpoint }) {
+
   let data;
   let error;
   let status;
@@ -97,7 +101,7 @@ async function performHttpRequest({ specId, resource, method, url, body, endpoin
 
   try {
     let resp = await axios[method](url, body);
-    data = R.prop('data', resp);
+    data = prop('data', resp);
     status = resp.status;
     onSuccess({ data, status });
   } catch (e) {
@@ -108,7 +112,7 @@ async function performHttpRequest({ specId, resource, method, url, body, endpoin
       error: e.message,
       code,
       status,
-      respBody: R.pathOr('', ['response', 'data'], e),
+      respBody: pathOr('', ['response', 'data'], e),
     });
 
     error = { code, message: e.message, status };
@@ -136,19 +140,20 @@ function initializeSpec(naiveSpec, builderArgs = {}) {
   //    might only be available during the (incoming API) request and so we
   //    need to merge in those values (being sure to only include the values
   //    from builderArgs which are applicable to the spec)
-  const tmpl = R.reduce(assignOrCreate, naiveSpec, REQUIRE_HTTP_REQUEST_ARGS);
-  const data = R.pick(R.keys(tmpl), builderArgs);
-  const spec = R.merge(tmpl, data);
+  const tmpl = reduce(assignOrCreate, naiveSpec, REQUIRE_HTTP_REQUEST_ARGS);
+  const data = pick(keys(tmpl), builderArgs);
+  const spec = merge(tmpl, data);
+
 
   // Anything still undefined is a problem as we do not know where or how to
   // fill in that data
-  const undefValues = R.keys(R.pickBy(isUndef, spec));
-  const errors = R.map(missingArgumentError, undefValues);
+  const undefValues = keys(pickBy(isUndef, spec));
+  const errors = map(missingArgumentError, undefValues);
 
   return { errors, spec };
 }
 
-export default (naiveSpec, builderArgs) => {
+const requester = (naiveSpec, builderArgs) => {
   let { errors, spec } = initializeSpec(naiveSpec, builderArgs);
 
   let { error: pathError, path } = buildPath(spec.path, builderArgs);
@@ -157,24 +162,24 @@ export default (naiveSpec, builderArgs) => {
   let { errors: argErrors, requestArgs } = extractRequestArgsFromSpec(spec);
   errors = errors.concat(argErrors);
 
-  const host = R.propOr('unknown', 'host', spec);
-  const url = R.join('', [host, path]);
-  const method = R.propOr('unknown', 'method', spec);
+  const host = propOr('unknown', 'host', spec);
+  const url = join('', [host, path]);
+  const method = propOr('unknown', 'method', spec);
   const endpoint = `${method.toUpperCase()} ${spec.path}`;
 
   // Because we blindly concat errors from each build step
-  errors = R.reject(R.isNil, errors);
+  errors = reject(isNil, errors);
 
   // To make things easier, make errors undefined when no errors exist. This
   // matches a desired pattern of simply returning `{ data }` when no error
   // exist thus making `error` undefined when the caller destructures it.
-  errors = R.isEmpty(errors) ? undefined : errors;
+  errors = isEmpty(errors) ? undefined : errors;
 
-  const requester = async function() {
+  const requester = async function () {
     if (errors) {
       const msg = 'You are attempting to perform an http request against ' +
         'a spec which could not be compiled cleanly, failing with the ' +
-        `following error(s): ${R.toString(errors)}`;
+        `following error(s): ${toString(errors)}`;
 
       return { error: { message: msg, code: INVALID_SPEC_ERROR } };
     }
@@ -188,3 +193,5 @@ export default (naiveSpec, builderArgs) => {
 
   return { errors, requester };
 }
+
+export default requester;

@@ -1,5 +1,4 @@
-import R from 'ramda';
-import { expect } from 'chai';
+import R from 'rambda';
 
 export function createAsync({ resolveWith, rejectWith }) {
   return () => new Promise((resolve, reject) => {
@@ -14,5 +13,5 @@ export function createAsync({ resolveWith, rejectWith }) {
 const extractCode = ({ code }) => code;
 
 export const expectToFindErrorCode = (code, errors) => {
-  return expect(R.map(extractCode, errors)).to.include(code);
+  return expect(R.map(extractCode, errors)).toContain(code);
 };

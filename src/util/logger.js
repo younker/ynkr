@@ -1,9 +1,9 @@
-import * as R from 'ramda';
-import bunyan from 'bunyan';
+import { pathOr } from 'rambda';
+import loglevel from 'loglevel';
 
 import env from './env';
 
-const LOGGER = bunyan.createLogger({ name: 'ynkr' });
+const LOGGER = loglevel.getLogger('ynkr');
 const DEFAULT_LOGGER_LEVEL = 'debug';
 
 // https://github.com/trentm/node-bunyan#levels
@@ -16,17 +16,18 @@ const LOGGER_LEVELS = {
   trace: 10,
 };
 
-let level = R.pathOr(undefined, ['env', 'LOGGER_LEVEL'], process);
+const level = pathOr(undefined, ['env', 'LOGGER_LEVEL'], process.env);
+
 if (level && LOGGER_LEVELS[level]) {
-  LOGGER.level(level);
+  LOGGER.setLevel(level);
 } else if (env.isTest) {
   // Silence test unless we want logs (at which point we will have to run with
   // the LOGGER_LEVEL env variable set). Should I ever add a test around code
   // that logs a fatal, I'll be forced to come back in here and force a silent
   // level. Until then, this works well enough.
-  LOGGER.level('FATAL');
+  LOGGER.setLevel('FATAL');
 } else {
-  LOGGER.level(DEFAULT_LOGGER_LEVEL);
+  LOGGER.setLevel(DEFAULT_LOGGER_LEVEL);
 }
 
 export default LOGGER;

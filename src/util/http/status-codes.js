@@ -1,4 +1,4 @@
-import * as R from 'ramda';
+import { prop, propOr, reduce, keys, isNil } from 'rambda';
 
 // Error Nomenclature
 //   - status: a numeric id for an HTTP state
@@ -72,7 +72,7 @@ const statusToCode = {
 // Following best practices (from graphql specifically), this provides the
 // ability to supply a human-readable version of the HTTP status
 export const getCodeForStatus = (status, defaultCode = undefined) => {
-  return R.propOr(defaultCode, status, statusToCode);
+  return propOr(defaultCode, status, statusToCode);
 };
 
 // When you need a status (int), looking them up by name is more readable. For
@@ -84,9 +84,9 @@ const reduceFn = (acc, status) => {
   acc[statusToCode[status]] = status;
   return acc;
 };
-const codeToStatus = R.reduce(reduceFn, {}, R.keys(statusToCode));
+const codeToStatus = reduce(reduceFn, {}, keys(statusToCode));
 
 export const getStatusForCode = (code, defaultStatus = undefined) => {
-  const status = R.prop(code, codeToStatus);
-  return R.isNil(status) ? defaultStatus : parseInt(status);
+  const status = prop(code, codeToStatus);
+  return isNil(status) ? defaultStatus : parseInt(status);
 };

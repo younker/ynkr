@@ -1,10 +1,10 @@
-@import 'styles/_colors.scss';
+@use 'src/styles/colors' as c;
 
 .Terminal {
   font-family: Inconsolata, monospace;
-  color: $cmd-line-grey;
+  color: c.$cmd-line-grey;
 
   pre {
-    color: $cmd-line-grey;
+    color: c.$cmd-line-grey;
   }
 }
