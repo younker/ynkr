@@ -2,7 +2,7 @@ import React from 'react';
 
 import './style.scss';
 
-export default ({ turn, player }) => {
+export default function Turn({ turn, player }) {
   const active = turn === player ? 'active' : '';
 
   return (

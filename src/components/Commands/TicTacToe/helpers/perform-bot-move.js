@@ -37,4 +37,6 @@ const handleResponse = (dispatch) => {
   };
 };
 
-export default ({ dispatch, ...body }) => makeRequest(body).then(handleResponse(dispatch));
+const mv = ({ dispatch, ...body }) => makeRequest(body).then(handleResponse(dispatch));
+
+export default mv;

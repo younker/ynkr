@@ -44,7 +44,7 @@ const DEFAULT_STATE = {
   collection: [{ type: 'input' }],
 };
 
-export default (props) => {
+export default function Terminal(props) {
   const [state, dispatch] = useReducer(reducer, DEFAULT_STATE);
 
   const termIO = state.collection.map(({ type, ...item }, idx) => {
@@ -56,7 +56,7 @@ export default (props) => {
     <TerminalDispatch.Provider value={dispatch}>
       <Container className='Terminal' fluid='true'>
         <Welcome />
-        { termIO }
+        {termIO}
       </Container>
     </TerminalDispatch.Provider>
   );

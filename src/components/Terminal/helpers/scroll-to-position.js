@@ -7,7 +7,7 @@ const extractCommandHistoryFromState = ({ collection }) => {
     }, []);
 };
 
-export default (state, { direction, input }) => {
+const scroller = (state, { direction, input }) => {
   let scroll = state.scroll;
 
   if (!scroll) {
@@ -38,3 +38,5 @@ export default (state, { direction, input }) => {
 
   return state;
 };
+
+export default scroller;

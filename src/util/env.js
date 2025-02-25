@@ -1,4 +1,4 @@
-import { pathOr, defaultTo } from 'rambda';
+import { defaultTo } from 'rambda';
 
 // We are stage-less (other than test) so this should work
 const DEFAULT_ENV = 'production';

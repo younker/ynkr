@@ -7,7 +7,7 @@ describe('Status Codes Util', () => {
     });
 
     test('will return undefined for invalid status', () => {
-      expect(getCodeForStatus(1234567890)).toBe.undefined;
+      expect(getCodeForStatus(1234567890)).not.toBeDefined();
     });
 
     test('will return default code', () => {
@@ -25,7 +25,7 @@ describe('Status Codes Util', () => {
     });
 
     test('will return undefined for invalid code', () => {
-      expect(getStatusForCode('BOGUS')).toBe.undefined;
+      expect(getStatusForCode('BOGUS')).not.toBeDefined();
     });
 
     test('will return default status', () => {

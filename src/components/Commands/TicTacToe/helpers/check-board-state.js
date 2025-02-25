@@ -11,15 +11,15 @@ const WINNING_COMBOS = [
   [6, 7, 8], // bottom row, straight across
 ];
 
-export default (board) => {
-  for (let [a,b,c] of WINNING_COMBOS) {
+export default function Board(board) {
+  for (let [a, b, c] of WINNING_COMBOS) {
     const owners = [board[a], board[b], board[c]].join('');
     if (owners === '111' || owners === '222') {
-      return { status: GAME_OVER, winner: board[a], winningCombo: [a,b,c] };
+      return { status: GAME_OVER, winner: board[a], winningCombo: [a, b, c] };
     }
   }
 
   const openCells = board.some(i => i === 0);
   const status = openCells ? GAME_ON : GAME_OVER;
   return { status };
-}
+};

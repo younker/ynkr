@@ -1,4 +1,4 @@
-export default (state) => {
+export default function Prompt(state) {
   const collection = [
     ...state.collection,
     { type: 'input' }

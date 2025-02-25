@@ -1,9 +1,9 @@
-import { map, dissoc, propOr } from 'rambda';
+import { map, dissoc } from 'rambda';
 
 import axios from 'axios';
 import getRequester from '../../../src/util/http/requester';
 
-import { createAsync, expectToFindErrorCode } from '../../../test/helper';
+import { expectToFindErrorCode } from '../../../test/helper';
 
 // Globally mock axios; we will clear mocks after each run (see below)
 jest.mock('axios');
@@ -33,20 +33,19 @@ describe('/util/http/requester', function () {
     test('will fail when missing required spec fields', function () {
       const invalidSpec = dissoc('specId', validSpec);
       const { errors } = getRequester(invalidSpec, validArgs);
-      expect(errors).not.ToBeUndefined;
+      expect(errors).toBeDefined();
     });
 
     test('will populate undefined values from args', function () {
       const spec = { ...validSpec, foo: undefined };
       const args = { ...validArgs, foo: 'bar' };
       const { errors } = getRequester(spec, args);
-      expect(errors).toBe.undefined;
+      expect(errors).not.toBeDefined();
     });
 
     test('will return back a collection of errors', function () {
       const { errors } = getRequester({});
       expect(errors).toBeInstanceOf(Array);
-      expect(errors).not.ToBeEmpty;
     });
 
     test('returns error for missing resource path', function () {
@@ -86,17 +85,17 @@ describe('/util/http/requester', function () {
 
     test('for valid spec will return a requester function', function () {
       const { errors, requester } = getRequester(validSpec, validArgs);
-      expect(errors).toBe.undefined;
+      expect(errors).not.toBeDefined();
       expect(typeof (requester)).toEqual('function');
     });
 
     test('will fail if an HTTP request is attempted against an invalid spec', async function () {
       const { errors, requester } = getRequester({});
-      expect(errors).not.ToBeEmpty;
+      expect(errors).toBeInstanceOf(Array);
 
       const { error, data } = await requester();
       expect(error.code).toEqual('INVALID_SPEC_ERROR');
-      expect(data).toBe.undefined;
+      expect(data).not.toBeDefined();
     });
   });
 
@@ -104,15 +103,15 @@ describe('/util/http/requester', function () {
     test('no errors will be returned for happy path', async () => {
       axios.get.mockResolvedValue({ data: 'OK', status: 200 });
 
-      const { errors, requester } = getRequester(validSpec, validArgs);
-      expect(errors).toBeUndefined();
+      const { errors } = getRequester(validSpec, validArgs);
+      expect(errors).not.toBeDefined();
     });
 
     test('makes HTTP request with expected args', async () => {
       axios.get.mockResolvedValue({ data: 'OK', status: 200 });
 
       const { errors, requester } = getRequester(validSpec, validArgs);
-      expect(errors).toBeUndefined();
+      expect(errors).not.toBeDefined();
 
       await requester();
 
@@ -126,7 +125,7 @@ describe('/util/http/requester', function () {
       const queryParams = {};
 
       const { errors, requester } = getRequester(validSpec, { ...validArgs, queryParams });
-      expect(errors).toBeUndefined();
+      expect(errors).not.toBeDefined();
 
       await requester();
 
@@ -139,7 +138,7 @@ describe('/util/http/requester', function () {
 
       const queryParams = { query: 'params' };
       const { errors, requester } = getRequester(validSpec, { ...validArgs, queryParams });
-      expect(errors).toBeUndefined();
+      expect(errors).not.toBeDefined();
 
       await requester();
 
@@ -154,11 +153,11 @@ describe('/util/http/requester', function () {
       axios.get.mockResolvedValue(response);
 
       const { errors, requester } = getRequester(validSpec, validArgs);
-      expect(errors).toBeUndefined();
+      expect(errors).not.toBeDefined();
 
       const { data, error } = await requester();
       expect(data).toEqual(payload);
-      expect(error).toBe.undefined;
+      expect(error).not.toBeDefined();
     });
 
     test('failed HTTP request handling', async function () {
@@ -166,7 +165,7 @@ describe('/util/http/requester', function () {
       axios.get.mockRejectedValue(new Error(httpFailure));
 
       const { errors, requester } = getRequester(validSpec, validArgs);
-      expect(errors).toBeUndefined();
+      expect(errors).not.toBeDefined();
 
       const { error: { message, code } } = await requester();
       expect(message).toEqual(httpFailure);

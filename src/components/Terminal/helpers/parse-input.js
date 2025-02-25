@@ -26,7 +26,7 @@ const parseArguments = (args) => {
   return parsed;
 };
 
-export default (input) => {
+export default function ParseInput(input) {
   const [command, ...rawArgs] = map(trim, input.split(' '));
   const args = parseArguments(rawArgs);
   return { command, args };

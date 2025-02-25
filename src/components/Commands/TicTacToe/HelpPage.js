@@ -1,6 +1,7 @@
 import React from 'react';
 
-export default () => (<pre>{`
+export default function HelpPage() {
+  <pre>{`
 TIC-TAC-TOE(1)                  BS Command Manual                 TIC-TAC-TOE(1)
 
 NAME
@@ -44,4 +45,5 @@ instead of having any number of pieces, each player only had three, thus they
 had to move them around to empty spaces to keep playing.
 
 BS                               March 16, 2019                               BS
-`}</pre>);
+`}</pre>
+};

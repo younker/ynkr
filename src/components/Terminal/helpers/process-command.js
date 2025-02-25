@@ -1,6 +1,6 @@
 import parseTerminalInput from './parse-input';
 
-export default (state, { command: input }) => {
+export default function ProcessCommand(state, { command: input }) {
   const { command, args } = parseTerminalInput(input);
   const collection = [
     ...state.collection,

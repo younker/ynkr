@@ -24,7 +24,7 @@ const timerArgs = (gameState, turn, player) => {
   return { action };
 };
 
-const Scoreboard = ({ turn, gameState, winner }) => {
+export default function Scoreboard({ turn, gameState, winner }) {
   const [state, setState] = useState(DEFAULT_STATE);
   const gameOver = gameState === GAME_OVER;
 
@@ -62,6 +62,3 @@ const Scoreboard = ({ turn, gameState, winner }) => {
     </div>
   );
 };
-
-export default Scoreboard;
-

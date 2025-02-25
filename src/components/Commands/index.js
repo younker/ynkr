@@ -9,9 +9,11 @@ export const publicCommands = {
   'tic-tac-toe': TicTacToe,
 };
 
-export default {
+const cmds = {
   CommandNotFound,
   Compgen,
   Man,
   TicTacToe,
 };
+
+export default cmds;

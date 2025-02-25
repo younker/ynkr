@@ -10,4 +10,6 @@ const output = ({ gameOver, winner }) => {
   return winner ? `Player ${winner} wins!` : 'Draw!';
 }
 
-export default (props) => <div className="GameSummary">{output(props)}</div>;
+const summary = (props) => <div className="GameSummary">{output(props)}</div>;
+
+export default summary;
