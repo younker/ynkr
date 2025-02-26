@@ -35,9 +35,18 @@ const reducer = (state, { action, ...args }) => {
       //   { cellIdx: 3 }
       // This tells us the current player used their turn to own cell 3 which
       // then requires us to manually update it.
+      let actor = BOT;
       if (!board) {
+        actor = HUMAN;
         board = [...state.board];
         board[cellIdx] = turn.id();
+      }
+
+      // This is meant to guard against a human clicking a space while waiting
+      // for the bot to return results
+      const player = turn.currentPlayer();
+      if (actor != player.actor) {
+        return state;
       }
 
       // Did someone win the game based on the last move? If not, then switch

@@ -21,13 +21,11 @@ Your Friend,
 Jason Younker
 
 ## TODO
-- [ ] bug: if you `tic-tac-toe --player-one bot`, you can click while it's the bots turn
 - [ ] allow double-click (select) -> copy. Right now `App`'s `useEffect` steals focus
 - [ ] command line:
   - [ ] auto-complete
   - [ ] reverse search
   - [ ] clear
-- [ ] hook up ci
 - [ ] [dotenv-extended](https://www.npmjs.com/package/dotenv-extended)
 
 ## Jest Issue
