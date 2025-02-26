@@ -22,6 +22,7 @@ const Timer = ({ action }) => {
     return setTimeout(() => setState({ runtime, start, state: RUNNING }), 100);
   };
 
+  /* eslint-disable */
   useEffect(() => {
     if (action === 'run') {
       const timer = scheduleUpdate();
@@ -31,8 +32,8 @@ const Timer = ({ action }) => {
     } else if (action === 'reset') {
       setState(DEFAULT_STATE);
     }
-  });
-
+  }, [action, state]);
+  /* eslint-enable */
   return (
     <span className="Timer">
       {(state.runtime / 1000).toFixed(1)}

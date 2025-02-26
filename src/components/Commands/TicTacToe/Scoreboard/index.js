@@ -30,17 +30,19 @@ export default function Scoreboard({ turn, gameState, winner }) {
 
   useEffect(() => {
     if (gameOver) {
-      const scores = { ...state };
-      if (winner === PLAYER_ONE) {
-        scores.playerOne += 1;
-      } else if (winner === PLAYER_TWO) {
-        scores.playerTwo += 1;
-      } else {
-        scores.draws += 1;
-      }
-      setState(scores);
+      setState((s) => {
+        const scores = { ...s };
+        if (winner === PLAYER_ONE) {
+          scores.playerOne += 1;
+        } else if (winner === PLAYER_TWO) {
+          scores.playerTwo += 1;
+        } else {
+          scores.draws += 1;
+        }
+        return scores;
+      })
     }
-  }, [gameState]);
+  }, [gameOver, winner]);
 
   return (
     <div className='Scoreboard'>
