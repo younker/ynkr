@@ -32,7 +32,7 @@ const onKeyUpHandler = ({ gameDispatch, gameOver }) => {
         break;
 
       default:
-        // noop but eslint requires a default case
+      // noop but eslint requires a default case
     }
 
     e.preventDefault();

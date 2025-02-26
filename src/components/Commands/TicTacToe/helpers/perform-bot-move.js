@@ -31,12 +31,11 @@ const handleResponse = (dispatch) => {
       dispatch({ action: GAME_ERROR, message });
 
     } else {
-      const board = data.board;
-      dispatch({ action: MOVE_COMPLETE, board });
+      dispatch({ action: MOVE_COMPLETE, ...data });
     }
   };
 };
 
-const mv = ({ dispatch, ...body }) => makeRequest(body).then(handleResponse(dispatch));
-
-export default mv;
+export default function performBotMove({ dispatch, ...body }) {
+  makeRequest(body).then(handleResponse(dispatch));
+};

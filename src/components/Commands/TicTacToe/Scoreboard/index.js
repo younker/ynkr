@@ -17,7 +17,7 @@ const timerArgs = (gameState, turn, player) => {
   if (gameState === NEW_GAME) {
     action = 'reset';
   } else if (gameState === GAME_ON) {
-    action = turn === player ? 'run' : 'pause';
+    action = turn.id() === player ? 'run' : 'pause';
   } else {
     action = 'pause';
   }

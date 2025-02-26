@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default function HelpPage() {
-  <pre>{`
+  return (<pre>{`
 TIC-TAC-TOE(1)                  BS Command Manual                 TIC-TAC-TOE(1)
 
 NAME
@@ -16,13 +16,19 @@ DESCRIPTION
 
     The options are as follows:
 
-    --vs v
-        Player one's opponent. By default, it is defined as BOT. Currently BOT
-        will make an HTTP request to an API hosting the lamda function found at
-        https://github.com/younker/tic-tac-toe
+    --player-one <actor>
+        Designates who the actor should be for player 1. Actor values can be
+        either "human" or "bot".
 
-        If you would rather play against yourself, the 'human' value for this
-        option is availabe.
+        Default: human
+
+    --player-two <actor>
+        Designates who the actor should be for player 2. Actor values can be
+        either "human" or "bot".
+
+        Default:
+          When player 1 is not defined or "human", player 2 will default to "bot".
+          When player 1 is "bot", player 2 will default to "human".
 
 EXAMPLES
 
@@ -30,12 +36,17 @@ EXAMPLES
 
     $ tic-tac-toe
 
-        Will start a normal game of tic-tac-toe where player one is current user
-        and player two is a bot.
+        Will start a game of tic-tac-toe where player one is current user and
+        player two is a bot.
 
-    $ tic-tac-toe --vs human
+    $ tic-tac-toe --player-one bot
 
-        Same thing, no bot.
+        Will start a game of tic-tac-toe where player one is a bot and player
+        two is the current user.
+
+    $ tic-tac-toe --player-one bot --player-two bot
+
+        Will start a game that will play itself.
 
 HISTORY
 
@@ -45,5 +56,5 @@ instead of having any number of pieces, each player only had three, thus they
 had to move them around to empty spaces to keep playing.
 
 BS                               March 16, 2019                               BS
-`}</pre>
+`}</pre>);
 };

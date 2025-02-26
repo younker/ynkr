@@ -4,23 +4,20 @@ import Cell from '../Cell';
 import { NEW_GAME, GAME_ON } from '../constants';
 import './style.scss';
 
-const Board = ({ cells, gameState, turn, winningCombo }) => {
-  const createCell = (owner, i) => (
+export default function Board({ cells, gameState, winningCombo }) {
+  const createCell = (cellOwner, i) => (
     <Cell
       key={i}
       cellIdx={i}
       active={gameState === GAME_ON || gameState === NEW_GAME}
-      owner={owner}
-      turn={turn}
+      owner={cellOwner}
       strike={winningCombo.includes(i)}
     />
   );
 
   return (
     <div className="Board">
-      { cells.map(createCell) }
+      {cells.map(createCell)}
     </div>
   );
 }
-
-export default Board;

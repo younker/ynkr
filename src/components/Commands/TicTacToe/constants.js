@@ -1,5 +1,8 @@
 export const PLAYER_ONE = 1;
+export const PLAYER_ONE_LABEL = 'X';
+
 export const PLAYER_TWO = 2;
+export const PLAYER_TWO_LABEL = 'O';
 
 export const BOT = 'bot';
 export const HUMAN = 'human';
@@ -8,8 +11,8 @@ export const MOVE_COMPLETE = 'moveComplete';
 
 export const CELL_OWNERS = {
   0: '',  // empty square - no owner
-  1: 'X', // player 1
-  2: 'O', // player 2
+  1: PLAYER_ONE_LABEL,
+  2: PLAYER_TWO_LABEL
 };
 
 export const NEW_GAME = 'newGame';

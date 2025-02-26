@@ -1,31 +1,28 @@
-import React, { useContext } from 'react';
-
+import { useContext } from 'react';
 import { CELL_OWNERS, MOVE_COMPLETE } from '../constants';
 import { GameDispatch } from '../index';
 import './style.scss';
 
-const onClickHandler = ({ cellIdx, active, owner, turn, gameDispatch }) => {
+const onClickHandler = ({ cellIdx, active, owner, gameDispatch }) => {
   if (owner || !active) {
     return;
   }
 
-  return (e) => {
-    gameDispatch({ action: MOVE_COMPLETE, player: turn, cellIdx });
-    e.preventDefault();
+  return (evt) => {
+    gameDispatch({ action: MOVE_COMPLETE, cellIdx });
+    evt.preventDefault();
   }
 };
 
-const Cell = ({ cellIdx, active, owner, turn, strike }) => {
+export default function Cell({ cellIdx, active, owner, strike }) {
   const gameDispatch = useContext(GameDispatch);
 
   return (
     <div
       className={'Cell ' + (strike ? 'strike' : '')}
-      onClick={onClickHandler({ cellIdx, active, owner, turn, gameDispatch })}
+      onClick={onClickHandler({ cellIdx, active, owner, gameDispatch })}
     >
-      { CELL_OWNERS[owner] }
+      {CELL_OWNERS[owner]}
     </div>
   );
 };
-
-export default Cell;
