@@ -45,7 +45,7 @@ const reducer = (state, { action, ...args }) => {
       // This is meant to guard against a human clicking a space while waiting
       // for the bot to return results
       const player = turn.currentPlayer();
-      if (actor != player.actor) {
+      if (actor !== player.actor) {
         return state;
       }
 
