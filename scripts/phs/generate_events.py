@@ -12,7 +12,12 @@ Sources:
        curl -sL "https://calendar.sportsyou.com/access/us-d013f552-4b88-43ce-b91f-d7fbd5d5e687/b159f961-740a-4ccc-a99c-143beda9c2ae" \
          -o scripts/phs/data/sportsyou.ics
 
-Usage: python3 scripts/phs/generate_events.py   (requires: pip install openpyxl)
+Usage: PHS_PASSWORD=<password> python3 scripts/phs/generate_events.py
+(requires: pip install openpyxl cryptography)
+
+Output is public/phs/events.json.enc: AES-256-GCM ciphertext with the key
+derived from PHS_PASSWORD via PBKDF2-SHA256. The page decrypts it in the
+browser with WebCrypto; plaintext never ships to S3.
 
 Duration rule for master events (sheet has start times only): 2 hours by
 default, truncated to the start of the next event at the same facility on the
@@ -20,22 +25,29 @@ same day. Facility = Subsite if present else Site, with the "Football/Track"
 subsite folded into Curtis Field.
 """
 
+import base64
+import hashlib
 import html
 import json
+import os
 import re
+import secrets
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import openpyxl
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 ROOT = Path(__file__).resolve().parents[2]
 XLSX = ROOT / "master-schedule.xlsx"
 ICS = Path(__file__).resolve().parent / "data" / "sportsyou.ics"
-OUT = ROOT / "public" / "phs" / "events.json"
+OUT = ROOT / "public" / "phs" / "events.json.enc"
 
 LOCAL_TZ = ZoneInfo("America/New_York")
 DEFAULT_DURATION = timedelta(hours=2)
+PBKDF2_ITERATIONS = 600_000
 
 
 def facility_of(site, subsite):
@@ -184,13 +196,27 @@ def load_sportsyou():
     return events
 
 
+def encrypt(plaintext, password):
+    salt = secrets.token_bytes(16)
+    iv = secrets.token_bytes(12)
+    key = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, PBKDF2_ITERATIONS, dklen=32)
+    ct = AESGCM(key).encrypt(iv, plaintext.encode(), None)  # ciphertext||tag, WebCrypto-compatible
+    b64 = lambda b: base64.b64encode(b).decode()  # noqa: E731
+    return json.dumps(
+        {"v": 1, "kdf": "PBKDF2-SHA256", "iter": PBKDF2_ITERATIONS, "salt": b64(salt), "iv": b64(iv), "ct": b64(ct)}
+    )
+
+
 def main():
+    password = os.environ.get("PHS_PASSWORD")
+    if not password:
+        sys.exit("PHS_PASSWORD env var is required")
     events = load_master() + load_ad() + load_sportsyou()
     events.sort(key=lambda e: e["start"])
     for i, e in enumerate(events):
         e["id"] = i
     facilities = sorted({e["facility"] for e in events if e["facility"]})
-    OUT.write_text(json.dumps({"facilities": facilities, "events": events}, indent=1))
+    OUT.write_text(encrypt(json.dumps({"facilities": facilities, "events": events}), password))
     by_source = {}
     for e in events:
         by_source[e["source"]] = by_source.get(e["source"], 0) + 1

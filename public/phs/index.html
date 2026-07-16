@@ -195,9 +195,32 @@
     header h1 { display: none; }
     #range-label { font-size: 15px; }
   }
+
+  /* password gate: calendar chrome hidden until unlock */
+  body.locked header, body.locked #filters, body.locked main { display: none; }
+  #gate {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  body.locked #gate { display: flex; }
+  #gate input {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 15px;
+    padding: 9px 12px;
+    width: 220px;
+  }
+  #gate input:focus { outline: 2px solid var(--master); border-color: transparent; }
 </style>
 </head>
-<body>
+<body class="locked">
+  <div id="gate">
+    <form id="gate-form">
+      <input type="password" id="gate-pw" autocomplete="off" autofocus aria-label="Password">
+    </form>
+  </div>
   <header>
     <h1>PHS Facilities</h1>
     <button class="btn" id="today-btn">Today</button>
@@ -534,22 +557,68 @@
     document.querySelector('.week-scroll').scrollTop = 7 * HOUR_PX;
   }
 
-  fetch('events.json')
-    .then(function (r) { return r.json(); })
-    .then(function (data) {
-      state.facilities = data.facilities;
-      data.facilities.forEach(function (f) { state.facilitiesOn[f] = true; });
-      state.events = data.events.map(function (e) {
-        e.startDate = new Date(e.start);
-        e.endDate = new Date(e.end);
-        return e;
-      });
-      render();
-      scrollToMorning();
-    })
-    .catch(function (err) {
-      document.body.innerHTML = '<p style="padding:24px">Failed to load events: ' + err + '</p>';
+  /* ---------- password gate ---------- */
+
+  function b64bytes(s) {
+    var bin = atob(s);
+    var out = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  function decrypt(payload, password) {
+    var enc = new TextEncoder();
+    return crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey'])
+      .then(function (base) {
+        return crypto.subtle.deriveKey(
+          { name: 'PBKDF2', hash: 'SHA-256', salt: b64bytes(payload.salt), iterations: payload.iter },
+          base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+      })
+      .then(function (key) {
+        return crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64bytes(payload.iv) }, key, b64bytes(payload.ct));
+      })
+      .then(function (buf) { return JSON.parse(new TextDecoder().decode(buf)); });
+  }
+
+  function boot(data) {
+    state.facilities = data.facilities;
+    data.facilities.forEach(function (f) { state.facilitiesOn[f] = true; });
+    state.events = data.events.map(function (e) {
+      e.startDate = new Date(e.start);
+      e.endDate = new Date(e.end);
+      return e;
     });
+    document.body.classList.remove('locked');
+    render();
+    scrollToMorning();
+  }
+
+  var payloadPromise = fetch('events.json.enc').then(function (r) { return r.json(); });
+
+  function attempt(password, interactive) {
+    return payloadPromise
+      .then(function (payload) { return decrypt(payload, password); })
+      .then(function (data) {
+        sessionStorage.setItem('phs-pw', password);
+        boot(data);
+      })
+      .catch(function () {
+        if (interactive) {
+          // wrong password: nothing but a blank page
+          document.body.innerHTML = '';
+        } else {
+          sessionStorage.removeItem('phs-pw');
+        }
+      });
+  }
+
+  document.getElementById('gate-form').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    attempt(document.getElementById('gate-pw').value, true);
+  });
+
+  var cached = sessionStorage.getItem('phs-pw');
+  if (cached) attempt(cached, false);
 })();
 </script>
 </body>
