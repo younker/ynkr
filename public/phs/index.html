@@ -126,6 +126,34 @@
   .toggle-row .lbl { font-size: 14px; color: var(--disabled); }
   .toggle-row.on .lbl { color: var(--text); }
   .facility-row .lbl { font-size: 13.5px; }
+  .help {
+    margin-left: auto;
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--box-off);
+    border-radius: 50%;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 13px;
+    text-align: center;
+    flex-shrink: 0;
+    cursor: help;
+  }
+  .help:hover { border-color: var(--icon); color: var(--icon); }
+  #tip {
+    position: fixed;
+    background: #202124;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.4;
+    padding: 8px 10px;
+    max-width: 260px;
+    z-index: 20;
+    display: none;
+    box-shadow: 0 2px 8px rgba(60,64,67,0.3);
+  }
+  #tip.visible { display: block; }
 
   /* ---------- main ---------- */
   .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
@@ -349,15 +377,19 @@
   </div>
 
   <div id="detail"></div>
+  <div id="tip" role="tooltip"></div>
 
 <script>
 (function () {
   'use strict';
 
   var SOURCES = [
-    { key: 'master', label: 'Master Schedule' },
-    { key: 'ad', label: 'AD Times' },
-    { key: 'sportsyou', label: 'sportsYou' }
+    { key: 'master', label: 'Master Schedule',
+      help: "These are the events from the 'Master home from Arbiter 7/1 - 11/1/26' excel google doc." },
+    { key: 'ad', label: 'AD Times',
+      help: 'These are the times provided by the PHS Athletic Director.' },
+    { key: 'sportsyou', label: 'sportsYou',
+      help: "These are the times that I have communicated to the team for events that I have requested through the AD's office in May." }
   ];
   var SRC_ACCENT = { master: '#1a73e8', ad: '#188038', sportsyou: '#e8710a' };
   var DEFAULT_FACILITIES_ON = ['Curtis Field', 'Northmen Stadium'];
@@ -460,14 +492,33 @@
     return row;
   }
 
+  function attachHelp(row, text) {
+    var tip = document.getElementById('tip');
+    var icon = document.createElement('span');
+    icon.className = 'help';
+    icon.textContent = '?';
+    icon.onclick = function (ev) { ev.stopPropagation(); }; // don't toggle the source
+    icon.onmouseenter = function () {
+      tip.textContent = text;
+      tip.classList.add('visible');
+      var r = icon.getBoundingClientRect();
+      tip.style.left = Math.min(r.right + 8, window.innerWidth - tip.offsetWidth - 8) + 'px';
+      tip.style.top = Math.max(8, Math.min(r.top - 4, window.innerHeight - tip.offsetHeight - 8)) + 'px';
+    };
+    icon.onmouseleave = function () { tip.classList.remove('visible'); };
+    row.appendChild(icon);
+  }
+
   function renderToggles() {
     var st = document.getElementById('source-toggles');
     st.innerHTML = '';
     SOURCES.forEach(function (s) {
-      st.appendChild(toggleRow(s.label, state.sourcesOn[s.key], SRC_ACCENT[s.key], '', function () {
+      var row = toggleRow(s.label, state.sourcesOn[s.key], SRC_ACCENT[s.key], '', function () {
         state.sourcesOn[s.key] = !state.sourcesOn[s.key];
         render();
-      }));
+      });
+      attachHelp(row, s.help);
+      st.appendChild(row);
     });
     var ft = document.getElementById('facility-toggles');
     ft.innerHTML = '';
