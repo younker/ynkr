@@ -7,178 +7,262 @@
 <title>PHS Facilities Calendar</title>
 <style>
   :root {
-    --master: #1a73e8;
-    --ad: #188038;
-    --sportsyou: #e8710a;
-    --border: #dadce0;
     --text: #3c4043;
     --muted: #70757a;
-    --hour-height: 48px;
+    --disabled: #80868b;
+    --faint: #bdc1c6;
+    --icon: #5f6368;
+    --line: #e8eaed;
+    --grid-line: #f1f3f4;
+    --control: #dadce0;
+    --box-off: #9aa0a6;
+    --hover: #f1f3f4;
+    --active-tint: #e8f0fe;
+    --blue: #1a73e8;
+    --hour: 84px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: 'Google Sans', Roboto, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     color: var(--text);
     height: 100vh;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  /* ---------- password gate ---------- */
+  body.locked .app { display: none; }
+  #gate { display: none; align-items: center; justify-content: center; height: 100vh; }
+  body.locked #gate { display: flex; }
+  #gate input {
+    border: 1px solid var(--control);
+    border-radius: 4px;
+    font-size: 15px;
+    padding: 9px 12px;
+    width: 220px;
+  }
+  #gate input:focus { outline: 2px solid var(--blue); border-color: transparent; }
+
+  /* ---------- app frame ---------- */
+  .app { display: flex; height: 100vh; min-width: 1000px; }
+
+  /* ---------- sidebar ---------- */
+  .sidebar {
+    width: 264px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--line);
+    padding: 16px 14px 16px 16px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    gap: 18px;
+    overflow: hidden auto;
   }
+  .brand { display: flex; gap: 12px; align-items: center; }
+  .hamburger { display: flex; flex-direction: column; gap: 4px; }
+  .hamburger span { width: 18px; height: 2px; background: var(--icon); border-radius: 2px; }
+  .logo-tile {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: var(--blue);
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: -0.5px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .brand-title { font-size: 19px; font-weight: 400; }
 
-  header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 16px;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-    flex-shrink: 0;
+  .mini-cal .mini-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .mini-label { font-size: 14px; font-weight: 500; }
+  .mini-nav { display: flex; gap: 2px; }
+  .mini-nav button, .chev {
+    border: none; background: none; cursor: pointer;
+    color: var(--icon);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
   }
-  header h1 { font-size: 22px; font-weight: 400; margin-right: 12px; white-space: nowrap; }
-  .btn {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--text);
-    cursor: pointer;
-    font-size: 14px;
-    padding: 7px 14px;
-  }
-  .btn:hover { background: #f1f3f4; }
-  .nav-arrow { border: none; font-size: 18px; padding: 6px 10px; border-radius: 50%; }
-  #range-label { font-size: 20px; font-weight: 400; white-space: nowrap; }
-  .spacer { flex: 1; }
-  .view-switch { display: flex; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
-  .view-switch .btn { border: none; border-radius: 0; }
-  .view-switch .btn.active { background: #e8f0fe; color: var(--master); }
-
-  #filters {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-    flex-shrink: 0;
-  }
-  .chip {
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    background: #fff;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 13px;
-    padding: 5px 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .chip .dot { width: 10px; height: 10px; border-radius: 50%; background: #bbb; }
-  .chip.on { color: #fff; border-color: transparent; }
-  .chip.on .dot { background: rgba(255,255,255,.85); }
-  .chip.src-master.on { background: var(--master); }
-  .chip.src-ad.on { background: var(--ad); }
-  .chip.src-sportsyou.on { background: var(--sportsyou); }
-  .chip.facility.on { background: #5f6368; }
-  .filter-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
-  .divider { width: 1px; height: 22px; background: var(--border); }
-
-  main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-
-  /* month view */
-  #month { flex: 1; display: none; flex-direction: column; overflow: hidden; }
-  #month.visible { display: flex; }
-  .month-dow {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .month-dow div { text-align: center; font-size: 11px; color: var(--muted); padding: 4px; text-transform: uppercase; }
-  .month-grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); overflow-y: auto; }
-  .month-cell {
-    border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 2px;
-    min-height: 96px;
-    overflow: hidden;
+  .mini-nav button { width: 26px; height: 26px; font-size: 14px; }
+  .mini-nav button:hover { background: var(--hover); }
+  .mini-dow, .mini-week { display: grid; grid-template-columns: repeat(7, 1fr); }
+  .mini-dow div { font-size: 10px; color: var(--muted); text-align: center; height: 22px; line-height: 22px; }
+  .mini-week { border-radius: 15px; }
+  .mini-week.selected { background: var(--active-tint); }
+  .mini-day { height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .mini-day span {
+    width: 26px; height: 26px; line-height: 26px;
+    border-radius: 50%;
+    text-align: center;
     font-size: 12px;
   }
+  .mini-day span:hover { background: var(--hover); }
+  .mini-day.out span { color: var(--faint); }
+  .mini-week.selected .mini-day span { color: var(--blue); font-weight: 600; }
+
+  .section-label {
+    font-size: 13px; font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .toggle-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .toggle-row:hover { background: var(--hover); }
+  .box {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    border: 2px solid var(--box-off);
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .toggle-row.on .box { border-color: var(--accent); background: var(--accent); }
+  .toggle-row .lbl { font-size: 14px; color: var(--disabled); }
+  .toggle-row.on .lbl { color: var(--text); }
+  .facility-row .lbl { font-size: 13.5px; }
+
+  /* ---------- main ---------- */
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .topbar {
+    height: 64px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 0 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .today-btn {
+    padding: 8px 18px;
+    border: 1px solid var(--control);
+    border-radius: 20px;
+    background: #fff;
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .today-btn:hover { background: #f8f9fa; }
+  .chev { width: 36px; height: 36px; font-size: 20px; }
+  .chev:hover { background: var(--hover); }
+  .range-title { font-size: 22px; font-weight: 400; white-space: nowrap; }
+  .spacer { flex: 1; }
+  .search-btn { width: 40px; height: 40px; border: none; background: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .search-btn:hover { background: var(--hover); }
+  .seg { display: flex; border: 1px solid var(--control); border-radius: 8px; overflow: hidden; }
+  .seg button { padding: 7px 18px; font-size: 14px; border: none; background: #fff; color: var(--text); cursor: pointer; }
+  .seg button.active { background: var(--active-tint); color: var(--blue); font-weight: 500; }
+
+  /* ---------- week view ---------- */
+  #week { flex: 1; display: none; flex-direction: column; min-height: 0; }
+  #week.visible { display: flex; }
+  .day-head { display: flex; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+  .gutter-spacer { width: 64px; flex-shrink: 0; }
+  .day-cell { flex: 1; text-align: center; padding: 8px 0 10px; border-left: 1px solid var(--grid-line); }
+  .day-cell .dow { font-size: 11px; letter-spacing: 0.8px; color: var(--muted); }
+  .day-cell .num {
+    font-size: 24px; font-weight: 400;
+    margin-top: 2px;
+    width: 40px; height: 40px; line-height: 40px;
+    display: inline-block;
+    border-radius: 50%;
+  }
+  .day-cell.today .num { background: var(--blue); color: #fff; }
+
+  .allday-row { display: flex; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+  .allday-row.empty { display: none; }
+  .allday-col { flex: 1; border-left: 1px solid var(--grid-line); padding: 2px; min-width: 0; }
+  .allday-bar {
+    border-radius: 10px;
+    color: #fff;
+    font-size: 11.5px;
+    font-weight: 500;
+    line-height: 20px;
+    padding: 0 8px;
+    margin: 2px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .grid-scroll { flex: 1; overflow-y: auto; display: flex; }
+  .time-gutter { width: 64px; flex-shrink: 0; position: relative; }
+  .time-gutter div {
+    position: absolute;
+    right: 8px;
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .day-col {
+    flex: 1;
+    position: relative;
+    border-left: 1px solid var(--grid-line);
+    background-image: repeating-linear-gradient(var(--grid-line) 0 1px, transparent 1px var(--hour));
+  }
+
+  .card {
+    position: absolute;
+    border-radius: 6px;
+    border-left: 3px solid;
+    padding: 5px 7px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(60,64,67,0.12);
+    cursor: pointer;
+  }
+  .card .t { font-size: 11.5px; font-weight: 500; line-height: 1.25; }
+  .card .w { font-size: 11.5px; opacity: 0.82; margin-top: 2px; }
+  .src-master { background: #e8f0fe; color: #174ea6; border-color: #1a73e8; }
+  .src-ad { background: #e6f4ea; color: #0b5323; border-color: #188038; }
+  .src-sportsyou { background: #fdead3; color: #8a4b13; border-color: #e8710a; }
+  .bar-master { background: #1a73e8; }
+  .bar-ad { background: #188038; }
+  .bar-sportsyou { background: #e8710a; }
+  .cancelled { text-decoration: line-through; opacity: 0.55; }
+
+  /* ---------- month view ---------- */
+  #month { flex: 1; display: none; flex-direction: column; min-height: 0; }
+  #month.visible { display: flex; }
+  .month-dow { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid var(--line); flex-shrink: 0; }
+  .month-dow div { text-align: center; font-size: 11px; letter-spacing: 0.8px; color: var(--muted); padding: 6px 0; }
+  .month-grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: minmax(96px, 1fr); overflow-y: auto; }
+  .month-cell { border-right: 1px solid var(--grid-line); border-bottom: 1px solid var(--grid-line); padding: 3px; overflow: hidden; font-size: 12px; }
   .month-cell .day-num {
     display: inline-block;
     font-size: 12px;
-    width: 22px; height: 22px; line-height: 22px;
+    width: 24px; height: 24px; line-height: 24px;
     text-align: center;
     border-radius: 50%;
     margin-bottom: 2px;
   }
-  .month-cell.other-month .day-num { color: #b8bcc1; }
-  .month-cell.today .day-num { background: var(--master); color: #fff; }
+  .month-cell.out .day-num { color: var(--faint); }
+  .month-cell.today .day-num { background: var(--blue); color: #fff; }
   .pill {
     border-radius: 4px;
-    color: #fff;
-    cursor: pointer;
+    border-left: 3px solid;
     font-size: 11px;
-    line-height: 1.5;
-    margin-bottom: 1px;
+    line-height: 1.6;
+    margin-bottom: 2px;
     overflow: hidden;
-    padding: 0 4px;
+    padding: 0 5px;
     text-overflow: ellipsis;
     white-space: nowrap;
+    cursor: pointer;
+    font-weight: 500;
   }
-  .more-link { color: var(--muted); cursor: pointer; font-size: 11px; padding: 0 4px; }
+  .pill.bar { color: #fff; border: none; border-radius: 10px; }
+  .more-link { color: var(--muted); cursor: pointer; font-size: 11px; padding: 0 5px; }
   .more-link:hover { text-decoration: underline; }
 
-  /* week view */
-  #week { flex: 1; display: none; flex-direction: column; overflow: hidden; }
-  #week.visible { display: flex; }
-  .week-header { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-  .gutter-spacer { width: 56px; flex-shrink: 0; }
-  .week-day-col-head { flex: 1; text-align: center; padding: 6px 0; border-left: 1px solid var(--border); }
-  .week-day-col-head .dow { font-size: 11px; color: var(--muted); text-transform: uppercase; }
-  .week-day-col-head .num {
-    font-size: 22px;
-    width: 38px; height: 38px; line-height: 38px;
-    margin: 2px auto 0;
-    border-radius: 50%;
-  }
-  .week-day-col-head.today .num { background: var(--master); color: #fff; }
-  .week-scroll { flex: 1; overflow-y: auto; display: flex; }
-  .time-gutter { width: 56px; flex-shrink: 0; }
-  .time-gutter div {
-    height: var(--hour-height);
-    font-size: 10px;
-    color: var(--muted);
-    text-align: right;
-    padding-right: 6px;
-    transform: translateY(-6px);
-  }
-  .week-grid { flex: 1; display: flex; position: relative; }
-  .week-day-col { flex: 1; border-left: 1px solid var(--border); position: relative; }
-  .hour-line { height: var(--hour-height); border-bottom: 1px solid #eceff1; }
-  .event-block {
-    position: absolute;
-    border-radius: 4px;
-    color: #fff;
-    cursor: pointer;
-    font-size: 11px;
-    line-height: 1.3;
-    overflow: hidden;
-    padding: 2px 4px;
-    border: 1px solid #fff;
-  }
-  .event-block .time { opacity: .85; font-size: 10px; }
-  .src-master-bg { background: var(--master); }
-  .src-ad-bg { background: var(--ad); }
-  .src-sportsyou-bg { background: var(--sportsyou); }
-  .cancelled { text-decoration: line-through; opacity: .55; }
-
-  /* event detail popover */
+  /* ---------- detail popover ---------- */
   #detail {
     position: fixed;
     background: #fff;
     border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0,0,0,.28);
+    box-shadow: 0 4px 16px rgba(60,64,67,0.28);
     display: none;
     max-width: 340px;
     min-width: 240px;
@@ -190,29 +274,6 @@
   #detail p { font-size: 13px; color: var(--muted); margin-bottom: 3px; }
   #detail .close { position: absolute; top: 8px; right: 10px; border: none; background: none; font-size: 16px; cursor: pointer; color: var(--muted); }
   #detail .src-tag { display: inline-block; border-radius: 3px; color: #fff; font-size: 11px; padding: 1px 6px; margin-bottom: 6px; }
-
-  @media (max-width: 700px) {
-    header h1 { display: none; }
-    #range-label { font-size: 15px; }
-  }
-
-  /* password gate: calendar chrome hidden until unlock */
-  body.locked header, body.locked #filters, body.locked main { display: none; }
-  #gate {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
-  body.locked #gate { display: flex; }
-  #gate input {
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    font-size: 15px;
-    padding: 9px 12px;
-    width: 220px;
-  }
-  #gate input:focus { outline: 2px solid var(--master); border-color: transparent; }
 </style>
 </head>
 <body class="locked">
@@ -221,40 +282,71 @@
       <input type="password" id="gate-pw" autocomplete="off" autofocus aria-label="Password">
     </form>
   </div>
-  <header>
-    <h1>PHS Facilities</h1>
-    <button class="btn" id="today-btn">Today</button>
-    <button class="btn nav-arrow" id="prev-btn" aria-label="Previous">&#8249;</button>
-    <button class="btn nav-arrow" id="next-btn" aria-label="Next">&#8250;</button>
-    <span id="range-label"></span>
-    <span class="spacer"></span>
-    <div class="view-switch">
-      <button class="btn" data-view="week">Week</button>
-      <button class="btn" data-view="month">Month</button>
-    </div>
-  </header>
 
-  <div id="filters">
-    <span class="filter-label">Sources</span>
-    <span id="source-chips"></span>
-    <span class="divider"></span>
-    <span class="filter-label">Facilities</span>
-    <span id="facility-chips"></span>
-  </div>
+  <div class="app">
+    <div class="sidebar">
+      <div class="brand">
+        <div class="hamburger"><span></span><span></span><span></span></div>
+        <div class="logo-tile">PHS</div>
+        <div class="brand-title">Facilities</div>
+      </div>
 
-  <main>
-    <div id="month">
-      <div class="month-dow"></div>
-      <div class="month-grid"></div>
-    </div>
-    <div id="week">
-      <div class="week-header"></div>
-      <div class="week-scroll">
-        <div class="time-gutter"></div>
-        <div class="week-grid"></div>
+      <div class="mini-cal">
+        <div class="mini-head">
+          <span class="mini-label" id="mini-label"></span>
+          <span class="mini-nav">
+            <button id="mini-prev" aria-label="Previous month">&#8249;</button>
+            <button id="mini-next" aria-label="Next month">&#8250;</button>
+          </span>
+        </div>
+        <div class="mini-dow"><div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div></div>
+        <div id="mini-grid"></div>
+      </div>
+
+      <div>
+        <div class="section-label">Sources</div>
+        <div id="source-toggles"></div>
+      </div>
+
+      <div>
+        <div class="section-label">Facilities</div>
+        <div id="facility-toggles"></div>
       </div>
     </div>
-  </main>
+
+    <div class="main">
+      <div class="topbar">
+        <button class="today-btn" id="today-btn">Today</button>
+        <button class="chev" id="prev-btn" aria-label="Previous">&#8249;</button>
+        <button class="chev" id="next-btn" aria-label="Next">&#8250;</button>
+        <span class="range-title" id="range-title"></span>
+        <span class="spacer"></span>
+        <button class="search-btn" aria-label="Search">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="#5f6368" stroke-width="2"/>
+            <line x1="16" y1="16" x2="21" y2="21" stroke="#5f6368" stroke-width="2"/>
+          </svg>
+        </button>
+        <div class="seg">
+          <button data-view="week">Week</button>
+          <button data-view="month">Month</button>
+        </div>
+      </div>
+
+      <div id="week">
+        <div class="day-head"></div>
+        <div class="allday-row"></div>
+        <div class="grid-scroll">
+          <div class="time-gutter"></div>
+        </div>
+      </div>
+
+      <div id="month">
+        <div class="month-dow"></div>
+        <div class="month-grid"></div>
+      </div>
+    </div>
+  </div>
 
   <div id="detail"></div>
 
@@ -267,14 +359,20 @@
     { key: 'ad', label: 'AD Times' },
     { key: 'sportsyou', label: 'sportsYou' }
   ];
+  var SRC_ACCENT = { master: '#1a73e8', ad: '#188038', sportsyou: '#e8710a' };
+  var DEFAULT_FACILITIES_ON = ['Curtis Field', 'Northmen Stadium'];
   var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var DOW_UP = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
     'August', 'September', 'October', 'November', 'December'];
-  var HOUR_PX = 48;
+  var HOUR_PX = 84;
+  var DAY_START_H = 6; // grid window is 6 AM - midnight
+  var GRID_H = (24 - DAY_START_H) * HOUR_PX;
 
   var state = {
     view: 'week',
     anchor: startOfDay(new Date()),
+    miniMonth: null, // Date, first of displayed month
     sourcesOn: { master: true, ad: true, sportsyou: true },
     facilitiesOn: {},
     events: [],
@@ -287,52 +385,97 @@
   function sameDay(a, b) {
     return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
   }
-  function fmtTime(d) {
-    var h = d.getHours() % 12 || 12;
-    var m = d.getMinutes();
-    return h + (m ? ':' + String(m).padStart(2, '0') : '') + (d.getHours() < 12 ? 'am' : 'pm');
+
+  // "4 - 8:30pm": am/pm on the start only when it differs from the end's period
+  function fmtRange(s, e) {
+    function part(d, withSuffix) {
+      var h = d.getHours() % 12 || 12;
+      var m = d.getMinutes();
+      return h + (m ? ':' + String(m).padStart(2, '0') : '') + (withSuffix ? (d.getHours() < 12 ? 'am' : 'pm') : '');
+    }
+    var sPer = s.getHours() < 12 ? 'am' : 'pm';
+    var ePer = e.getHours() < 12 ? 'am' : 'pm';
+    return part(s, sPer !== ePer) + ' – ' + part(e, true);
   }
 
   function visibleEvents() {
     return state.events.filter(function (e) {
       if (!state.sourcesOn[e.source]) return false;
-      // facility chips scope the master-schedule source only
+      // facility toggles scope the master-schedule source only
       if (e.source === 'master' && e.facility && !state.facilitiesOn[e.facility]) return false;
       return true;
     });
   }
-
   function eventsOnDay(day) {
     return visibleEvents().filter(function (e) { return sameDay(e.startDate, day); });
   }
 
-  /* ---------- filter chips ---------- */
+  /* ---------- sidebar: mini calendar ---------- */
 
-  function renderChips() {
-    var sc = document.getElementById('source-chips');
-    sc.innerHTML = '';
+  function renderMiniCal() {
+    var m = state.miniMonth;
+    document.getElementById('mini-label').textContent = MONTHS[m.getMonth()] + ' ' + m.getFullYear();
+    var grid = document.getElementById('mini-grid');
+    grid.innerHTML = '';
+    var cur = startOfWeek(new Date(m.getFullYear(), m.getMonth(), 1));
+    var selStart = startOfWeek(state.anchor);
+    for (var w = 0; w < 6; w++) {
+      var row = document.createElement('div');
+      row.className = 'mini-week' + (sameDay(cur, selStart) ? ' selected' : '');
+      for (var d = 0; d < 7; d++) {
+        (function (day) {
+          var cell = document.createElement('div');
+          cell.className = 'mini-day' + (day.getMonth() !== m.getMonth() ? ' out' : '');
+          var span = document.createElement('span');
+          span.textContent = day.getDate();
+          cell.appendChild(span);
+          cell.onclick = function () {
+            state.anchor = day;
+            state.miniMonth = new Date(day.getFullYear(), day.getMonth(), 1);
+            render();
+          };
+          row.appendChild(cell);
+        })(cur);
+        cur = addDays(cur, 1);
+      }
+      grid.appendChild(row);
+    }
+  }
+
+  /* ---------- sidebar: toggles ---------- */
+
+  function toggleRow(label, on, accent, extraClass, onClick) {
+    var row = document.createElement('div');
+    row.className = 'toggle-row' + (extraClass ? ' ' + extraClass : '') + (on ? ' on' : '');
+    row.style.setProperty('--accent', accent);
+    var box = document.createElement('span');
+    box.className = 'box';
+    box.textContent = on ? '✓' : '';
+    var lbl = document.createElement('span');
+    lbl.className = 'lbl';
+    lbl.textContent = label;
+    row.appendChild(box);
+    row.appendChild(lbl);
+    row.onclick = onClick;
+    return row;
+  }
+
+  function renderToggles() {
+    var st = document.getElementById('source-toggles');
+    st.innerHTML = '';
     SOURCES.forEach(function (s) {
-      var b = document.createElement('button');
-      b.className = 'chip src-' + s.key + (state.sourcesOn[s.key] ? ' on' : '');
-      b.innerHTML = '<span class="dot"></span>' + s.label;
-      b.onclick = function () {
+      st.appendChild(toggleRow(s.label, state.sourcesOn[s.key], SRC_ACCENT[s.key], '', function () {
         state.sourcesOn[s.key] = !state.sourcesOn[s.key];
         render();
-      };
-      sc.appendChild(b);
+      }));
     });
-
-    var fc = document.getElementById('facility-chips');
-    fc.innerHTML = '';
+    var ft = document.getElementById('facility-toggles');
+    ft.innerHTML = '';
     state.facilities.forEach(function (f) {
-      var b = document.createElement('button');
-      b.className = 'chip facility' + (state.facilitiesOn[f] ? ' on' : '');
-      b.textContent = f;
-      b.onclick = function () {
+      ft.appendChild(toggleRow(f, state.facilitiesOn[f], '#5f6368', 'facility-row', function () {
         state.facilitiesOn[f] = !state.facilitiesOn[f];
         render();
-      };
-      fc.appendChild(b);
+      }));
     });
   }
 
@@ -343,15 +486,18 @@
     var src = SOURCES.filter(function (s) { return s.key === e.source; })[0];
     d.innerHTML =
       '<button class="close" aria-label="Close">&#10005;</button>' +
-      '<span class="src-tag src-' + e.source + '-bg">' + src.label + '</span>' +
+      '<span class="src-tag"></span>' +
       '<h2' + (e.cancelled ? ' class="cancelled"' : '') + '></h2>' +
       '<p class="when"></p>' +
       (e.location ? '<p class="where"></p>' : '') +
       (e.notes ? '<p class="notes"></p>' : '');
+    var tag = d.querySelector('.src-tag');
+    tag.textContent = src.label;
+    tag.style.background = SRC_ACCENT[e.source];
     d.querySelector('h2').textContent = e.title;
     d.querySelector('.when').textContent =
       DOW[e.startDate.getDay()] + ', ' + MONTHS[e.startDate.getMonth()] + ' ' + e.startDate.getDate() +
-      ' · ' + fmtTime(e.startDate) + ' – ' + fmtTime(e.endDate);
+      (e.allDay ? ' · all day' : ' · ' + fmtRange(e.startDate, e.endDate));
     if (e.location) d.querySelector('.where').textContent = e.location;
     if (e.notes) d.querySelector('.notes').textContent = e.notes;
     d.querySelector('.close').onclick = hideDetail;
@@ -365,17 +511,135 @@
   }
   function hideDetail() { document.getElementById('detail').classList.remove('visible'); }
   document.addEventListener('click', function (ev) {
-    if (!ev.target.closest('#detail') && !ev.target.closest('.pill') && !ev.target.closest('.event-block')) {
+    if (!ev.target.closest('#detail') && !ev.target.closest('.pill') &&
+        !ev.target.closest('.card') && !ev.target.closest('.allday-bar')) {
       hideDetail();
     }
   });
 
+  /* ---------- week view ---------- */
+
+  // greedy interval lane packing, applied per overlap-cluster so an isolated
+  // event keeps full width while a pile-up splits into side-by-side lanes
+  function packLanes(evs) {
+    evs.sort(function (a, b) { return a.startDate - b.startDate || b.endDate - a.endDate; });
+    var cluster = [], clusterEnd = null;
+    function flush() {
+      var laneEnds = [];
+      cluster.forEach(function (e) {
+        var placed = false;
+        for (var i = 0; i < laneEnds.length; i++) {
+          if (e.startDate >= laneEnds[i]) { e._lane = i; laneEnds[i] = e.endDate; placed = true; break; }
+        }
+        if (!placed) { e._lane = laneEnds.length; laneEnds.push(e.endDate); }
+      });
+      cluster.forEach(function (e) { e._lanes = laneEnds.length; });
+      cluster = [];
+    }
+    evs.forEach(function (e) {
+      if (cluster.length && e.startDate >= clusterEnd) flush();
+      cluster.push(e);
+      clusterEnd = clusterEnd && cluster.length > 1 ? new Date(Math.max(clusterEnd, e.endDate)) : e.endDate;
+    });
+    if (cluster.length) flush();
+  }
+
+  function renderWeek() {
+    var weekStart = startOfWeek(state.anchor);
+    var today = startOfDay(new Date());
+
+    var head = document.querySelector('.day-head');
+    head.innerHTML = '<div class="gutter-spacer"></div>';
+    for (var i = 0; i < 7; i++) {
+      var day = addDays(weekStart, i);
+      var h = document.createElement('div');
+      h.className = 'day-cell' + (sameDay(day, today) ? ' today' : '');
+      h.innerHTML = '<div class="dow">' + DOW_UP[day.getDay()] + '</div><div class="num">' + day.getDate() + '</div>';
+      head.appendChild(h);
+    }
+
+    // all-day bars
+    var alldayRow = document.querySelector('.allday-row');
+    alldayRow.innerHTML = '<div class="gutter-spacer"></div>';
+    var anyAllday = false;
+    for (var a = 0; a < 7; a++) {
+      (function (day) {
+        var col = document.createElement('div');
+        col.className = 'allday-col';
+        eventsOnDay(day).filter(function (e) { return e.allDay; }).forEach(function (e) {
+          anyAllday = true;
+          var bar = document.createElement('div');
+          bar.className = 'allday-bar bar-' + e.source + (e.cancelled ? ' cancelled' : '');
+          bar.textContent = e.title;
+          bar.title = e.title;
+          bar.onclick = function (ev) { ev.stopPropagation(); showDetail(e, bar); };
+          col.appendChild(bar);
+        });
+        alldayRow.appendChild(col);
+      })(addDays(weekStart, a));
+    }
+    alldayRow.className = 'allday-row' + (anyAllday ? '' : ' empty');
+
+    var scroll = document.querySelector('.grid-scroll');
+    var gutter = document.createElement('div');
+    gutter.className = 'time-gutter';
+    gutter.style.height = GRID_H + 'px';
+    for (var hr = DAY_START_H; hr < 24; hr++) {
+      var g = document.createElement('div');
+      g.style.top = ((hr - DAY_START_H) * HOUR_PX + 3) + 'px';
+      g.textContent = (hr % 12 || 12) + ' ' + (hr < 12 ? 'AM' : 'PM');
+      gutter.appendChild(g);
+    }
+    scroll.innerHTML = '';
+    scroll.appendChild(gutter);
+
+    for (var d = 0; d < 7; d++) {
+      (function (day) {
+        var col = document.createElement('div');
+        col.className = 'day-col';
+        col.style.height = GRID_H + 'px';
+        var evs = eventsOnDay(day).filter(function (e) { return !e.allDay; });
+        packLanes(evs);
+        evs.forEach(function (e) {
+          var startMin = Math.max(e.startDate.getHours() * 60 + e.startDate.getMinutes(), DAY_START_H * 60);
+          var endMin = sameDay(e.startDate, e.endDate)
+            ? e.endDate.getHours() * 60 + e.endDate.getMinutes()
+            : 24 * 60;
+          var card = document.createElement('div');
+          card.className = 'card src-' + e.source + (e.cancelled ? ' cancelled' : '');
+          card.style.top = ((startMin - DAY_START_H * 60) / 60 * HOUR_PX) + 'px';
+          card.style.height = Math.max(20, (endMin - startMin) / 60 * HOUR_PX - 4) + 'px';
+          var w = 100 / e._lanes;
+          card.style.left = 'calc(' + (e._lane * w) + '% + 2px)';
+          card.style.width = 'calc(' + w + '% - 4px)';
+          card.innerHTML = '<div class="t"></div><div class="w"></div>';
+          card.querySelector('.t').textContent = e.title;
+          card.querySelector('.w').textContent = fmtRange(e.startDate, e.endDate);
+          var src = SOURCES.filter(function (s) { return s.key === e.source; })[0];
+          card.title = e.title + ' · ' + fmtRange(e.startDate, e.endDate) + ' · ' + src.label;
+          card.onclick = function (ev) { ev.stopPropagation(); showDetail(e, card); };
+          col.appendChild(card);
+        });
+        scroll.appendChild(col);
+      })(addDays(weekStart, d));
+    }
+
+    var weekEnd = addDays(weekStart, 6);
+    var title;
+    if (weekStart.getMonth() === weekEnd.getMonth()) {
+      title = MONTHS[weekStart.getMonth()] + ' ' + weekStart.getDate() + ' – ' + weekEnd.getDate() + ', ' + weekEnd.getFullYear();
+    } else {
+      title = MONTHS[weekStart.getMonth()].slice(0, 3) + ' ' + weekStart.getDate() + ' – ' +
+        MONTHS[weekEnd.getMonth()].slice(0, 3) + ' ' + weekEnd.getDate() + ', ' + weekEnd.getFullYear();
+    }
+    document.getElementById('range-title').textContent = title;
+  }
+
   /* ---------- month view ---------- */
 
   function renderMonth() {
-    var dowRow = document.querySelector('.month-dow');
-    dowRow.innerHTML = DOW.map(function (d) { return '<div>' + d + '</div>'; }).join('');
-
+    document.querySelector('.month-dow').innerHTML =
+      DOW_UP.map(function (d) { return '<div>' + d + '</div>'; }).join('');
     var grid = document.querySelector('.month-grid');
     grid.innerHTML = '';
     var first = new Date(state.anchor.getFullYear(), state.anchor.getMonth(), 1);
@@ -386,19 +650,26 @@
       (function (day) {
         var cell = document.createElement('div');
         cell.className = 'month-cell' +
-          (day.getMonth() !== state.anchor.getMonth() ? ' other-month' : '') +
+          (day.getMonth() !== state.anchor.getMonth() ? ' out' : '') +
           (sameDay(day, today) ? ' today' : '');
         var num = document.createElement('span');
         num.className = 'day-num';
         num.textContent = day.getDate();
         cell.appendChild(num);
 
-        var evs = eventsOnDay(day).sort(function (a, b) { return a.startDate - b.startDate; });
+        var evs = eventsOnDay(day).sort(function (a, b) {
+          return (b.allDay - a.allDay) || (a.startDate - b.startDate);
+        });
         var MAX = 4;
         evs.forEach(function (e, idx) {
           var pill = document.createElement('div');
-          pill.className = 'pill src-' + e.source + '-bg' + (e.cancelled ? ' cancelled' : '');
-          pill.textContent = fmtTime(e.startDate) + ' ' + e.title;
+          if (e.allDay) {
+            pill.className = 'pill bar bar-' + e.source + (e.cancelled ? ' cancelled' : '');
+            pill.textContent = e.title;
+          } else {
+            pill.className = 'pill src-' + e.source + (e.cancelled ? ' cancelled' : '');
+            pill.textContent = fmtRange(e.startDate, e.endDate).split(' – ')[0] + ' ' + e.title;
+          }
           pill.title = e.title;
           if (idx >= MAX) pill.style.display = 'none';
           pill.onclick = function (ev) { ev.stopPropagation(); showDetail(e, pill); };
@@ -419,121 +690,33 @@
       cur = addDays(cur, 1);
     }
 
-    document.getElementById('range-label').textContent =
+    document.getElementById('range-title').textContent =
       MONTHS[state.anchor.getMonth()] + ' ' + state.anchor.getFullYear();
-  }
-
-  /* ---------- week view ---------- */
-
-  // side-by-side layout for overlapping events within one day column
-  function layoutDay(evs) {
-    evs.sort(function (a, b) { return a.startDate - b.startDate || b.endDate - a.endDate; });
-    var clusters = [];
-    var cluster = null, clusterEnd = null;
-    evs.forEach(function (e) {
-      if (!cluster || e.startDate >= clusterEnd) {
-        cluster = [];
-        clusters.push(cluster);
-        clusterEnd = e.endDate;
-      } else if (e.endDate > clusterEnd) {
-        clusterEnd = e.endDate;
-      }
-      cluster.push(e);
-    });
-    clusters.forEach(function (c) {
-      var cols = [];
-      c.forEach(function (e) {
-        var placed = false;
-        for (var i = 0; i < cols.length; i++) {
-          if (e.startDate >= cols[i]) { e._col = i; cols[i] = e.endDate; placed = true; break; }
-        }
-        if (!placed) { e._col = cols.length; cols.push(e.endDate); }
-      });
-      c.forEach(function (e) { e._cols = cols.length; });
-    });
-  }
-
-  function renderWeek() {
-    var head = document.querySelector('.week-header');
-    head.innerHTML = '<div class="gutter-spacer"></div>';
-    var weekStart = startOfWeek(state.anchor);
-    var today = startOfDay(new Date());
-
-    for (var i = 0; i < 7; i++) {
-      var day = addDays(weekStart, i);
-      var h = document.createElement('div');
-      h.className = 'week-day-col-head' + (sameDay(day, today) ? ' today' : '');
-      h.innerHTML = '<div class="dow">' + DOW[day.getDay()] + '</div><div class="num">' + day.getDate() + '</div>';
-      head.appendChild(h);
-    }
-
-    var gutter = document.querySelector('.time-gutter');
-    gutter.innerHTML = '';
-    for (var hr = 0; hr < 24; hr++) {
-      var g = document.createElement('div');
-      g.textContent = hr === 0 ? '' : (hr % 12 || 12) + (hr < 12 ? ' AM' : ' PM');
-      gutter.appendChild(g);
-    }
-
-    var grid = document.querySelector('.week-grid');
-    grid.innerHTML = '';
-    for (var d = 0; d < 7; d++) {
-      (function (day) {
-        var col = document.createElement('div');
-        col.className = 'week-day-col';
-        for (var hr2 = 0; hr2 < 24; hr2++) {
-          var line = document.createElement('div');
-          line.className = 'hour-line';
-          col.appendChild(line);
-        }
-        var evs = eventsOnDay(day);
-        layoutDay(evs);
-        evs.forEach(function (e) {
-          var startMin = e.startDate.getHours() * 60 + e.startDate.getMinutes();
-          var endMin = sameDay(e.startDate, e.endDate)
-            ? e.endDate.getHours() * 60 + e.endDate.getMinutes()
-            : 24 * 60;
-          var block = document.createElement('div');
-          block.className = 'event-block src-' + e.source + '-bg' + (e.cancelled ? ' cancelled' : '');
-          block.style.top = (startMin / 60 * HOUR_PX) + 'px';
-          block.style.height = Math.max(18, (endMin - startMin) / 60 * HOUR_PX - 2) + 'px';
-          var w = 100 / e._cols;
-          block.style.left = (e._col * w) + '%';
-          block.style.width = 'calc(' + w + '% - 2px)';
-          block.innerHTML = '<div class="title"></div><div class="time"></div>';
-          block.querySelector('.title').textContent = e.title;
-          block.querySelector('.time').textContent = fmtTime(e.startDate) + ' – ' + fmtTime(e.endDate);
-          block.onclick = function (ev) { ev.stopPropagation(); showDetail(e, block); };
-          col.appendChild(block);
-        });
-        grid.appendChild(col);
-      })(addDays(weekStart, d));
-    }
-
-    var weekEnd = addDays(weekStart, 6);
-    var label = weekStart.getMonth() === weekEnd.getMonth()
-      ? MONTHS[weekStart.getMonth()] + ' ' + weekStart.getFullYear()
-      : MONTHS[weekStart.getMonth()].slice(0, 3) + ' – ' + MONTHS[weekEnd.getMonth()].slice(0, 3) + ' ' + weekEnd.getFullYear();
-    document.getElementById('range-label').textContent = label;
   }
 
   /* ---------- top-level render / nav ---------- */
 
   function render() {
     hideDetail();
-    renderChips();
-    document.getElementById('month').className = state.view === 'month' ? 'visible' : '';
+    renderMiniCal();
+    renderToggles();
     document.getElementById('week').className = state.view === 'week' ? 'visible' : '';
-    document.querySelectorAll('.view-switch .btn').forEach(function (b) {
+    document.getElementById('month').className = state.view === 'month' ? 'visible' : '';
+    document.querySelectorAll('.seg button').forEach(function (b) {
       b.classList.toggle('active', b.dataset.view === state.view);
     });
-    if (state.view === 'month') renderMonth(); else renderWeek();
+    if (state.view === 'week') renderWeek(); else renderMonth();
+  }
+
+  function syncMini() {
+    state.miniMonth = new Date(state.anchor.getFullYear(), state.anchor.getMonth(), 1);
   }
 
   document.getElementById('today-btn').onclick = function () {
     state.anchor = startOfDay(new Date());
+    syncMini();
     render();
-    if (state.view === 'week') scrollToMorning();
+    scrollToMorning();
   };
   document.getElementById('prev-btn').onclick = function () { navigate(-1); };
   document.getElementById('next-btn').onclick = function () { navigate(1); };
@@ -543,9 +726,18 @@
     } else {
       state.anchor = addDays(state.anchor, dir * 7);
     }
+    syncMini();
     render();
   }
-  document.querySelectorAll('.view-switch .btn').forEach(function (b) {
+  document.getElementById('mini-prev').onclick = function () {
+    state.miniMonth = new Date(state.miniMonth.getFullYear(), state.miniMonth.getMonth() - 1, 1);
+    renderMiniCal();
+  };
+  document.getElementById('mini-next').onclick = function () {
+    state.miniMonth = new Date(state.miniMonth.getFullYear(), state.miniMonth.getMonth() + 1, 1);
+    renderMiniCal();
+  };
+  document.querySelectorAll('.seg button').forEach(function (b) {
     b.onclick = function () {
       state.view = b.dataset.view;
       render();
@@ -554,7 +746,8 @@
   });
 
   function scrollToMorning() {
-    document.querySelector('.week-scroll').scrollTop = 7 * HOUR_PX;
+    var s = document.querySelector('.grid-scroll');
+    if (s) s.scrollTop = 2 * HOUR_PX - 12; // land around 8 AM
   }
 
   /* ---------- password gate ---------- */
@@ -582,12 +775,15 @@
 
   function boot(data) {
     state.facilities = data.facilities;
-    data.facilities.forEach(function (f) { state.facilitiesOn[f] = true; });
+    data.facilities.forEach(function (f) {
+      state.facilitiesOn[f] = DEFAULT_FACILITIES_ON.indexOf(f) !== -1;
+    });
     state.events = data.events.map(function (e) {
       e.startDate = new Date(e.start);
       e.endDate = new Date(e.end);
       return e;
     });
+    syncMini();
     document.body.classList.remove('locked');
     render();
     scrollToMorning();

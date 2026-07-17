@@ -212,6 +212,16 @@ def main():
     if not password:
         sys.exit("PHS_PASSWORD env var is required")
     events = load_master() + load_ad() + load_sportsyou()
+
+    # drop events before the current week (Sunday start, at generation time)
+    today = datetime.now(LOCAL_TZ).date()
+    week_start = today - timedelta(days=(today.weekday() + 1) % 7)
+    events = [e for e in events if e["start"][:10] >= week_start.isoformat()]
+
+    # midnight-start events render as an all-day bar instead of a grid block
+    for e in events:
+        e["allDay"] = e["start"][11:16] == "00:00"
+
     events.sort(key=lambda e: e["start"])
     for i, e in enumerate(events):
         e["id"] = i
