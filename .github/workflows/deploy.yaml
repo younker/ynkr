@@ -32,3 +32,13 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-2
         run: aws s3 sync ./build s3://ynkr.org --delete
+
+      # index.html keeps its name across deploys while CloudFront caches it
+      # ~24h; without invalidation the cached index.html can reference hashed
+      # bundles that --delete just removed
+      - name: Invalidate CloudFront cache
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-2
+        run: aws cloudfront create-invalidation --distribution-id E18W3W0WPQGQOA --paths "/*"
